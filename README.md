@@ -1,10 +1,31 @@
-# Base Django · tres propuestas visuales
+# Pañol de informática
 
-[![CI](https://github.com/fersrm/Base-2/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/fersrm/Base-2/actions/workflows/ci.yml)
+Plataforma Django para inventario por cantidades, kits de materiales, carritos personales guardados, solicitudes de docentes/estudiantes, préstamos y devoluciones parciales. Conserva los usuarios, cargos, allauth/MFA, navegación, diseño y modo claro/oscuro de la base. Idioma `es-cl`, zona `America/Santiago`.
 
-Base reutilizable con usuarios, perfiles y cargos, autenticación allauth, MFA, navegación y modo claro/oscuro por cuenta. Django Templates, Tailwind standalone y crispy-tailwind. Idioma `es-cl`, zona `America/Santiago`; todavía sin módulo de negocio.
+## Uso del pañol
 
-## Elige un diseño
+ADMIN y MANAGER administran inventario, kits, solicitudes, entregas y devoluciones. RESTRICTED prepara carritos, guarda pedidos para repetirlos y consulta solo sus solicitudes/préstamos. Los kits agrupan componentes del inventario; no llevan un segundo stock. Docente/estudiante es el tipo del pedido y no añade un cargo ni una cuenta distinta.
+
+1. En **Catálogos del pañol**, registra una categoría. Áreas/carreras/asignaturas son opcionales.
+2. En **Inventario**, registra artículos y cantidades iniciales. Para cambiar cantidades después, usa **Ajustar existencias** con motivo.
+3. En **Kits del pañol**, prepara conjuntos de artículos por cantidad.
+4. En **Mi carrito**, agrega artículos/kits, guarda el pedido con un nombre o envía una solicitud. Para modificar un pedido guardado, cárgalo, edita el carrito y guarda con el mismo nombre confirmando su actualización.
+5. Un operador aprueba o rechaza la solicitud. **Aprobar no reserva ni descuenta**. **Confirmar entrega** crea el préstamo y descuenta todo de forma atómica. También puede entregar un préstamo directo desde su carrito a una cuenta habilitada.
+6. **Registrar devolución** admite recepciones parciales por artículo. Solo las unidades utilizables vuelven a disponibles; daños quedan separados y pérdidas como incidencias justificadas, sin sanciones automáticas.
+
+Inicio conserva la tabla de actividad de usuarios, permanece primero en el menú y muestra cifras reales: globales para operadores y propias para solicitantes. Movimientos conserva operador, fecha, motivo y documento de origen. No se incluyen datos/cuentas iniciales del ZIP externo ni solicitudes públicas sin cuenta.
+
+### Instalar el nuevo esquema en una base existente
+
+La migración `PanolApp/0001_initial.py` está incluida y fue ensayada con datos ficticios en SQLite temporal. No se ha aplicado a la base local existente por esta entrega. Después de respaldar y elegir explícitamente la base de destino, usa el entorno configurado:
+
+```powershell
+.\.venv\Scripts\python.exe manage.py migrate
+```
+
+Sin instalar el esquema, Inicio informa que el resumen del pañol no está disponible; no muestra cifras ficticias. No copies la base de datos del sistema Flask. Revertir la migración elimina datos del módulo: para una instalación con uso real, coordina restauración de código y respaldo.
+
+## Diseño heredado de la base
 
 Las tres ramas conservan la misma base funcional y ofrecen distintas presentaciones. `main` utiliza el diseño 1. Las capturas de Inicio contienen cuentas ficticias y un gráfico demostrativo.
 
@@ -114,15 +135,15 @@ python manage.py runserver
 
 ## CI y verificación local
 
-[El workflow de CI](.github/workflows/ci.yml) se ejecuta en push/PR de `main` y las ramas `codex/diseno-*`, además de permitir ejecución manual. Usa Ubuntu y Python 3.12, instala las dependencias, ejecuta `pip check`, las comprobaciones Django, detecta migraciones pendientes y corre la suite de `UsuarioApp` y `homeApp`.
+La verificación local usa `core.test_settings` y nunca la base de desarrollo. Esta copia no incluye un workflow de CI; los antecedentes de CI de Base-2 no certifican este derivado.
 
 ```bash
 python manage.py check --settings=core.test_settings
 python manage.py makemigrations --check --dry-run --settings=core.test_settings
-python manage.py test UsuarioApp homeApp --noinput --settings=core.test_settings
+python manage.py test UsuarioApp homeApp PanolApp --noinput --settings=core.test_settings
 ```
 
-`core.test_settings` no lee `.env`: utiliza SQLite en memoria, correo/caché locales y archivos temporales. La suite actual contiene 76 pruebas. CI no aplica migraciones a tu base ni despliega el proyecto.
+`core.test_settings` no lee `.env`: utiliza SQLite en memoria, correo/caché locales y archivos temporales. La suite verificada contiene 122 pruebas: 77 de la base (actualizando las expectativas del gráfico solicitado) y 45 del pañol, incluidas concurrencia, navegación y migración/reversión ficticia. Las pruebas no aplican migraciones a tu base existente ni despliegan el proyecto.
 
 ## Preparar el servidor
 

@@ -1,0 +1,11 @@
+{% extends 'components/Layout/base_extendido.html' %}
+{% load static %}
+{% block head_title %}{{ titulo }}{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'panol/panol.css' %}?v=009-3">{% endblock %}
+{% block content_main %}
+<div class="panol-page">
+  <div class="page-heading"><div><h1>{{ titulo }}</h1><p>{% block descripcion %}Pañol de informática{% endblock %}</p></div><div class="heading-actions">{% block acciones %}{% endblock %}</div></div>
+  {% if problemas %}<div role="alert" class="panol-errors panel">{% for problema in problemas %}<p>{{ problema }}</p>{% endfor %}</div>{% endif %}
+  {% block panol_content %}{% endblock %}
+</div>
+{% endblock %}

@@ -44,15 +44,16 @@ class RegresionInicioTests(TestCase):
                     render_to_string(f"{code}.html", request=request),
                 )
 
-    def test_inicio_conserva_grafico_demostrativo(self):
+    def test_inicio_muestra_grafico_real_del_panol(self):
         user = User.objects.create_user(
-            username="inicio", password="Prueba-2026-Segura!"
+            username="inicio", password="Prueba-2026-Segura!", is_superuser=True
         )
         self.client.force_login(user)
         response = self.client.get(reverse("Home"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Gráfico de ejemplo")
-        self.assertContains(response, "Datos demostrativos")
+        self.assertContains(response, "Entregas y recepciones")
+        self.assertNotContains(response, "Datos demostrativos")
+        self.assertEqual(sum(response.context["panol_grafico"]["entregas"]), 0)
         self.assertContains(response, "grafico_home.js")
 
     def test_inicio_distingue_actividad_y_accesos_con_datos_sinteticos(self):
@@ -72,7 +73,7 @@ class RegresionInicioTests(TestCase):
         self.assertEqual(len(response.context["usuarios_recientes"]), 5)
         self.assertNotContains(response, "inactivo_excluido")
         self.assertContains(response, "no confirma que el usuario siga conectado")
-        self.assertContains(response, "No representan la actividad de la plataforma")
+        self.assertNotContains(response, "Datos demostrativos")
 
     def test_errores_renderizan_para_anonimo_y_cuenta_sin_perfil(self):
         factory = RequestFactory()

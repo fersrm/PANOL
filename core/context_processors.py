@@ -28,7 +28,38 @@ def preferencias_visuales(request):
 def permisos_navegacion(request):
     """Expone al menú la misma política que protege el registro interno."""
     puede_gestionar = usuario_tiene_cargo(request.user, PermitsPositionMixin.permisos)
+    from PanolApp.permissions import puede_operar, puede_solicitar
+
+    secciones = {
+        "inventario": (
+            "inventario",
+            "articulo",
+            "articulo_nuevo",
+            "articulo_editar",
+            "ajustar",
+        ),
+        "kits": ("kits", "kit_nuevo", "kit_editar"),
+        "carrito": ("carrito",),
+        "plantillas": ("plantillas", "plantilla"),
+        "solicitudes": ("solicitudes", "solicitud", "enviar"),
+        "prestamos": ("prestamos", "prestamo", "directo", "devolver"),
+        "movimientos": ("consultas",),
+        "catalogos": ("catalogo", "catalogo_nuevo", "catalogo_editar"),
+    }
+    match = getattr(request, "resolver_match", None)
+    seccion = (
+        next(
+            (nombre for nombre, rutas in secciones.items() if match.url_name in rutas),
+            None,
+        )
+        if match and match.namespace == "panol"
+        else None
+    )
+
     return {
+        "seccion_panol": seccion,
+        "puede_usar_panol": puede_solicitar(request.user),
+        "puede_operar_panol": puede_operar(request.user),
         "puede_registrar_usuarios": bool(cargos_asignables(request.user)),
         "puede_gestionar_usuarios": puede_gestionar,
     }

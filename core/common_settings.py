@@ -14,7 +14,7 @@ DEFAULT_DJANGO_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
 ]
-LOCAL_APPS = ["homeApp", "UsuarioApp"]
+LOCAL_APPS = ["homeApp", "UsuarioApp", "PanolApp"]
 THIRD_APPS = [
     "tailwind",
     "theme",

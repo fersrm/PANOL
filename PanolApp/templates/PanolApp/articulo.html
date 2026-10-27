@@ -1,0 +1,7 @@
+{% extends 'PanolApp/base.html' %}{% load crispy_forms_tags %}
+{% block acciones %}<a class="button secondary" href="{% url 'panol:inventario' %}">Inventario</a>{% if operador %}<a class="button secondary" href="{% url 'panol:articulo_editar' articulo.pk %}">Editar artículo</a><a class="button" href="{% url 'panol:ajustar' articulo.pk %}">Ajustar existencias</a>{% endif %}{% endblock %}
+{% block panol_content %}
+<section class="panel panol-summary"><p>{{ articulo.codigo }} · {{ articulo.categoria }}</p><p>{{ articulo.descripcion|linebreaksbr }}</p><dl class="panol-stats"><div><dt>Disponible</dt><dd>{{ articulo.disponible }}</dd></div><div><dt>No disponible</dt><dd>{{ articulo.no_disponible }}</dd></div><div><dt>Mínimo</dt><dd>{{ articulo.minimo }}</dd></div></dl>{% if not articulo.activo or not articulo.categoria.activo %}<p class="badge warning">Deshabilitado para nuevos pedidos; conserva su historial.</p>{% endif %}</section>
+{% if articulo.activo and articulo.categoria.activo %}<section class="panel form-panel"><h2>Agregar a mi carrito</h2><form action="{% url 'panol:carrito' %}" method="post">{% csrf_token %}<input type="hidden" name="accion" value="agregar">{{ agregar|crispy }}<button class="button" type="submit">Agregar al carrito</button></form></section>{% endif %}
+{% if operador %}<section class="panel"><header class="panel-heading"><h2>Últimos movimientos</h2></header>{% include 'PanolApp/movimientos_tabla.html' with objetos=movimientos %}</section>{% endif %}
+{% endblock %}

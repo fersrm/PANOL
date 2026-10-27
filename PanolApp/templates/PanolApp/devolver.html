@@ -1,0 +1,4 @@
+{% extends 'PanolApp/base.html' %}{% load crispy_forms_tags %}
+{% block descripcion %}Registra solo lo recibido. Los daños y pérdidas no aumentan las unidades disponibles.{% endblock %}
+{% block acciones %}<a class="button secondary" href="{% url 'panol:prestamo' objeto.pk %}">Volver al préstamo</a>{% endblock %}
+{% block panol_content %}<section class="panel form-panel"><form method="post">{% csrf_token %}{{ form|crispy }}{{ formset.management_form }}{{ formset.non_form_errors }}{% for linea, fila in filas %}<fieldset class="panol-component"><legend>{{ linea.nombre }} · {{ linea.pendiente }} pendientes</legend>{{ fila|crispy }}</fieldset>{% endfor %}<p>Una pérdida resuelve la cantidad pendiente como incidencia; no registra una recepción física ni aplica sanciones.</p><button class="button" type="submit">Confirmar recepción e incidencias</button></form></section>{% endblock %}

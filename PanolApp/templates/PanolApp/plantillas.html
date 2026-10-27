@@ -1,0 +1,4 @@
+{% extends 'PanolApp/base.html' %}
+{% block descripcion %}Pedidos privados que puedes cargar y revisar antes de volver a solicitar.{% endblock %}
+{% block acciones %}<a class="button" href="{% url 'panol:carrito' %}">Armar pedido</a>{% endblock %}
+{% block panol_content %}<section class="panel"><ul class="panol-list">{% for objeto in objetos %}<li><a href="{% url 'panol:plantilla' objeto.pk %}">{{ objeto.nombre }}</a> · {{ objeto.lineas.count }} selecciones</li>{% empty %}<li>No tienes pedidos guardados. Arma un carrito y guárdalo con un nombre.</li>{% endfor %}</ul></section>{% include 'PanolApp/paginacion.html' %}{% endblock %}

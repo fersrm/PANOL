@@ -1,0 +1,4 @@
+{% extends 'PanolApp/base.html' %}{% load static crispy_forms_tags %}
+{% block panol_content %}
+<section class="panel form-panel"><form method="post">{% csrf_token %}{{ form|crispy }}<h2>Componentes del kit</h2><p>Una línea por artículo. No se admiten kits dentro de otros kits.</p>{{ formset.management_form }}{{ formset.non_form_errors }}<div id="kit-componentes">{% for fila in formset %}<div class="panol-component">{{ fila|crispy }}</div>{% endfor %}</div><template id="kit-vacio"><div class="panol-component">{{ formset.empty_form|crispy }}</div></template><div class="panol-toolbar"><button type="button" class="button secondary" id="agregar-componente">Agregar componente</button><button class="button" type="submit">Guardar kit</button><a class="button secondary" href="{{ volver }}">Cancelar</a></div></form></section>
+{% endblock %}{% block javascript %}<script defer src="{% static 'panol/kit.js' %}?v=009"></script>{% endblock %}

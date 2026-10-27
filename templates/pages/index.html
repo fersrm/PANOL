@@ -1,9 +1,10 @@
 {% extends 'components/Layout/base_extendido.html' %}
 {% load static humanize %}
 {% block head_title %}Inicio{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'panol/panol.css' %}?v=009-3">{% endblock %}
 {% block content_main %}
 <div class="page-heading">
-  <div><h1>Tu espacio de trabajo</h1><p>Revisa los accesos recientes y continúa con la gestión de cuentas.</p></div>
+  <div><h1>Pañol de informática</h1><p>Revisa los préstamos, las solicitudes y la actividad de la plataforma.</p></div>
   <div class="heading-actions">
     {% if puede_cambiar_modo %}
     <form action="{% url 'VisualMode' %}" method="post" class="visual-mode-form">
@@ -23,7 +24,7 @@
       {% endif %}
     </form>
     {% endif %}
-    <a href="{% url 'User' %}" class="button secondary">Ver usuarios</a>
+    {% if puede_usar_panol %}<a href="{% url 'panol:carrito' %}" class="button">Preparar pedido</a>{% endif %}<a href="{% url 'User' %}" class="button secondary">Ver usuarios</a>
   </div>
 </div>
 <section class="panel" aria-labelledby="tablaUsuarios">
@@ -37,6 +38,6 @@
   </div>
   <p class="panel-note">Actividad reciente: registro durante los últimos {{ actividad_minutos }} minutos. Es una aproximación; no confirma que el usuario siga conectado.</p>
 </section>
-<section class="panel chart-panel" aria-labelledby="chart-title"><header class="panel-heading"><div><h2 id="chart-title">Gráfico de ejemplo</h2><p>Datos demostrativos. No representan la actividad de la plataforma.</p></div><span class="badge">Demostración</span></header><div id="chart_home" class="chart-home" role="img" aria-label="Gráfico de ejemplo con series de evaporación, precipitación y temperatura"></div><p id="chart-unavailable" class="panel-note" hidden>El gráfico no está disponible. Puedes continuar utilizando la plataforma.</p></section>
+{% include 'PanolApp/dashboard.html' %}
 {% endblock %}
-{% block javascript %}<script defer src="https://cdn.jsdelivr.net/npm/echarts@6.1.0/dist/echarts.min.js" integrity="sha384-C2iskrW/uPW46KzOjrvJIQo4YkV8lkD+QS0CrDN18IIPIpT/g2USu8bTP3nvmIAD" crossorigin="anonymous"></script><script defer src="{% static 'js/grafico_home.js' %}?v=002"></script>{% endblock %}
+{% block javascript %}<script defer src="https://cdn.jsdelivr.net/npm/echarts@6.1.0/dist/echarts.min.js" integrity="sha384-C2iskrW/uPW46KzOjrvJIQo4YkV8lkD+QS0CrDN18IIPIpT/g2USu8bTP3nvmIAD" crossorigin="anonymous"></script><script defer src="{% static 'js/grafico_home.js' %}?v=009"></script>{% endblock %}

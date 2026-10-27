@@ -5,7 +5,7 @@
 <main class="auth-layout">
   <section class="auth-story" aria-labelledby="auth-story-title"><div class="auth-story-content"><div class="brand-rule" aria-hidden="true"></div><h2 id="auth-story-title">Todo listo para continuar.</h2><p>Accede a tu espacio de trabajo y administra tu cuenta desde un mismo lugar.</p></div></section>
   <section class="auth-form-area" aria-labelledby="login-title"><div class="form-panel">
-    <img class="auth-logo" src="{% static 'img/logo.svg' %}" alt="">
+    <img class="auth-logo" src="{% static 'img/logo.svg' %}?v=panol-1" alt="">
     <h1 id="login-title">Iniciar sesión</h1><p class="lede">Ingresa tus datos para acceder a la plataforma.</p>
     {% if not SOCIALACCOUNT_ONLY %}
       {% url 'account_login' as login_url %}

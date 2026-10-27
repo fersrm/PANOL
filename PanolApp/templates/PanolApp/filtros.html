@@ -1,0 +1,13 @@
+{% load crispy_forms_tags %}
+<form method="get" class="panel form-panel panol-filter" aria-label="Filtrar {{ titulo|lower }}">
+  {% if filtro.non_field_errors %}<div class="panol-filter-errors" role="alert">{{ filtro.non_field_errors }}</div>{% endif %}
+  <div class="panol-filter-fields{% if filtro.estado %} panol-filter-fields--state{% endif %}">
+    {% for campo in filtro %}
+    <div class="panol-filter-field{% if campo.name == 'q' %} panol-filter-field--search{% endif %}{% if campo.name == 'estado' %} panol-filter-field--state{% endif %}">{{ campo|as_crispy_field }}</div>
+    {% endfor %}
+  </div>
+  <div class="panol-filter-actions">
+    <button type="submit" class="button secondary">Filtrar</button>
+    <a href="{{ request.path }}" class="panol-filter-clear">Limpiar filtros</a>
+  </div>
+</form>

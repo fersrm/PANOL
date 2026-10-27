@@ -1,0 +1,19 @@
+{% extends 'PanolApp/base.html' %}
+{% block descripcion %}Consulta existencias y prepara tu pedido por artículos o kits.{% endblock %}
+{% block acciones %}<a class="button secondary" href="{% url 'panol:kits' %}">Ver kits</a>{% if operador %}<a class="button" href="{% url 'panol:articulo_nuevo' %}">Registrar artículo</a>{% endif %}{% endblock %}
+{% block panol_content %}
+<form method="get" class="panel form-panel panol-filter" aria-label="Filtrar inventario">
+  <div class="panol-filter-fields panol-filter-fields--inventory">
+    <div class="panol-filter-field"><label for="buscar">Buscar artículo, código o categoría</label><input id="buscar" type="search" name="q" value="{{ buscar }}" maxlength="200"></div>
+  </div>
+  <div class="panol-filter-actions">
+    <label class="panol-filter-check"><input type="checkbox" name="bajo" value="1" {% if request.GET.bajo == '1' %}checked{% endif %}> Bajo el mínimo</label>
+    <button class="button secondary" type="submit">Filtrar</button>
+    <a href="{% url 'panol:inventario' %}" class="panol-filter-clear">Limpiar filtros</a>
+  </div>
+</form>
+<section class="panel"><div class="table-region" role="region" aria-label="Inventario" tabindex="0"><table class="activity-table"><thead><tr><th>Código / artículo</th><th>Categoría</th><th>Disponible</th><th>Mínimo</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>
+{% for objeto in objetos %}<tr><th scope="row"><a href="{% url 'panol:articulo' objeto.pk %}">{{ objeto.nombre }}</a><p class="text-muted">{{ objeto.codigo }}</p></th><td>{{ objeto.categoria }}</td><td>{{ objeto.disponible }}</td><td>{{ objeto.minimo }}</td><td>{% if not objeto.activo %}<span class="badge">Deshabilitado</span>{% elif not objeto.categoria.activo %}<span class="badge">Categoría deshabilitada</span>{% elif objeto.bajo_minimo %}<span class="badge warning">Bajo mínimo</span>{% else %}<span class="badge success">Habilitado</span>{% endif %}</td><td><a class="button secondary" href="{% url 'panol:articulo' objeto.pk %}">Ver artículo</a></td></tr>{% empty %}<tr><td colspan="6">No hay artículos para estos filtros.{% if operador %} Registra una categoría y luego tu primer artículo.{% endif %}</td></tr>{% endfor %}
+</tbody></table></div></section>{% include 'PanolApp/paginacion.html' %}
+{% if operador %}<p class="panel-note">Administra <a href="{% url 'panol:catalogo' 'categorias' %}">categorías</a> antes de registrar artículos.</p>{% endif %}
+{% endblock %}

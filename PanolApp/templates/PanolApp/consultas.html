@@ -1,0 +1,3 @@
+{% extends 'PanolApp/base.html' %}{% load crispy_forms_tags %}
+{% block acciones %}<a class="button secondary" href="{% url 'panol:prestamos' %}?estado=vencido">Préstamos vencidos</a><a class="button secondary" href="{% url 'panol:inventario' %}?bajo=1">Bajo mínimo</a>{% endblock %}
+{% block panol_content %}{% include 'PanolApp/filtros.html' %}<section class="panel">{% include 'PanolApp/movimientos_tabla.html' %}</section>{% include 'PanolApp/paginacion.html' %}{% endblock %}
