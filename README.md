@@ -25,48 +25,18 @@ La migración `PanolApp/0001_initial.py` está incluida y fue ensayada con datos
 
 Sin instalar el esquema, Inicio informa que el resumen del pañol no está disponible; no muestra cifras ficticias. No copies la base de datos del sistema Flask. Revertir la migración elimina datos del módulo: para una instalación con uso real, coordina restauración de código y respaldo.
 
-## Diseño heredado de la base
+## Instalar
 
-Las tres ramas conservan la misma base funcional y ofrecen distintas presentaciones. `main` utiliza el diseño 1. Las capturas de Inicio contienen cuentas ficticias y un gráfico demostrativo.
-
-| Propuesta | Rama | Presentación |
-| --- | --- | --- |
-| [Diseño 1](https://github.com/fersrm/Base-2/tree/codex/diseno-1) | `codex/diseno-1` | Menú lateral y paleta petróleo |
-| [Diseño 2](https://github.com/fersrm/Base-2/tree/codex/diseno-2) | `codex/diseno-2` | Navegación superior y presentación compacta |
-| [Diseño 3](https://github.com/fersrm/Base-2/tree/codex/diseno-3) | `codex/diseno-3` | Navegación lateral compacta, tonos cálidos y títulos serif |
-
-### Diseño 1
-
-| Claro | Oscuro |
-| --- | --- |
-| ![Inicio del diseño 1 en modo claro](assets/previews/diseno-1-claro.jpg) | ![Inicio del diseño 1 en modo oscuro](assets/previews/diseno-1-oscuro.jpg) |
-
-### Diseño 2
-
-| Claro | Oscuro |
-| --- | --- |
-| ![Inicio del diseño 2 en modo claro](assets/previews/diseno-2-claro.png) | ![Inicio del diseño 2 en modo oscuro](assets/previews/diseno-2-oscuro.png) |
-
-### Diseño 3
-
-| Claro | Oscuro |
-| --- | --- |
-| ![Inicio del diseño 3 en modo claro](assets/previews/diseno-3-claro.png) | ![Inicio del diseño 3 en modo oscuro](assets/previews/diseno-3-oscuro.png) |
-
-## Clonar e instalar
-
-Requiere Python 3.12. El repositorio es privado: usa una cuenta o clave de despliegue con acceso de lectura. Este ejemplo para Linux descarga únicamente la rama elegida y su último estado, sin el historial de documentación y evidencias antiguas:
+Requiere Python 3.12. Desde la carpeta de este proyecto, crea un entorno virtual e instala las dependencias. En Linux:
 
 ```bash
-git clone --depth 1 --single-branch --branch codex/diseno-1 git@github.com:fersrm/Base-2.git
-cd Base-2
 python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 python -m pip check
 ```
 
-Sustituye la rama por `codex/diseno-2`, `codex/diseno-3` o `main`. En Windows crea el entorno con `py -3.12 -m venv .venv` y actívalo con `.\.venv\Scripts\Activate.ps1`.
+En Windows crea el entorno con `py -3.12 -m venv .venv` y actívalo con `.\.venv\Scripts\Activate.ps1`. Después ejecuta los mismos comandos de instalación y comprobación de dependencias.
 
 Las versiones Python están fijadas en `requirements.txt`; no copies entornos virtuales entre equipos. Tailwind 4.3.0 usa un binario standalone, sin npm/Node.js. Su CSS compilado se conserva en `theme/static/css/dist/styles.css`.
 
@@ -154,7 +124,7 @@ python manage.py check --deploy
 python manage.py collectstatic --noinput
 ```
 
-Sirve `/static/` desde `staticfiles/` y `/media/` desde `media/`. La base y las subidas necesitan almacenamiento persistente, permisos y respaldo/restauración propios: clonar el código no recupera cuentas, MFA ni fotos. Configura correo, logs y acceso según la instalación. Axes y preventconcurrentlogins permanecen desactivados. `runserver` es solo para desarrollo. El alojamiento y el servidor WSGI se configuran por instalación; este repositorio incorpora únicamente CI.
+Sirve `/static/` desde `staticfiles/` y `/media/` desde `media/`. La base y las subidas necesitan almacenamiento persistente, permisos y respaldo/restauración propios: clonar el código no recupera cuentas, MFA ni fotos. Configura correo, logs y acceso según la instalación. Axes y preventconcurrentlogins permanecen desactivados. `runserver` es solo para desarrollo. El alojamiento y el servidor WSGI se configuran por instalación.
 
 ## Personalizar y mantener liviana la copia
 
@@ -167,4 +137,4 @@ python manage.py tailwind --settings=core.test_settings build
 
 Conserva las raíces de fuentes en `theme/static_src/src/styles.css` y versiona el CSS compilado. Cambiar valores de colores existentes no exige compilar.
 
-Se versionan código, migraciones, pruebas, dependencias, estáticos y seis capturas para este README. Se excluyen `.env`, bases, archivos personales, entornos, cachés, binarios descargados y `staticfiles/`. Por decisión del propietario, docs/specs/prompts, instrucciones SDD y skills locales se conservan en el equipo y quedan fuera del seguimiento desde esta entrega. El historial Git previo se conserva; el clon superficial de arriba evita descargarlo. Las capturas de presentación no se incluyen en `collectstatic`.
+Se versionan código, migraciones, pruebas, dependencias y estáticos. Se excluyen `.env`, bases, archivos personales, entornos, cachés, binarios descargados y `staticfiles/`. Por decisión del propietario, docs/specs/prompts, instrucciones SDD y skills locales se conservan en el equipo y quedan fuera del seguimiento. Este README corresponde al pañol de informática y no incluye propuestas ni capturas de diseño de la base original.
