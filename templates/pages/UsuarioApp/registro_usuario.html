@@ -1,0 +1,15 @@
+{% extends 'components/Layout/base_pages.html' %}
+{% load static tailwind_filters %}
+{% block head_title %}Registrar usuario{% endblock %}
+{% block content_pages %}
+<h1>Registrar usuario</h1><p class="lede">Crea una cuenta y asigna su cargo de acceso.</p>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% include 'components/input_perfil.html' %}
+  {{ profile_form.non_field_errors }}
+  <div class="mb-4"><label for="id_position_FK">Cargo</label>{{ profile_form.position_FK }}{{ profile_form.position_FK.errors }}</div>
+  {{ user_form|crispy }}
+  {% include 'components/btn/button.html' with button_text='Registrar usuario' %}
+</form>
+{% endblock %}
+{% block javascript %}<script defer src="{% static 'js/script.js' %}?v=002"></script>{% endblock %}

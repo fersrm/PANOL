@@ -1,0 +1,8 @@
+<div class="notifications" aria-label="Notificaciones">
+{% for message in messages %}
+  <div class="toast" data-toast-type="{{ message.tags }}" role="{% if 'error' in message.tags %}alert{% else %}status{% endif %}">
+    <div class="toast-copy"><strong>{% if 'error' in message.tags %}Error{% elif 'success' in message.tags %}Completado{% elif 'warning' in message.tags %}Atención{% else %}Información{% endif %}</strong><p>{{ message }}</p></div>
+    <button type="button" class="toast-close" aria-label="Cerrar notificación">✕</button>
+  </div>
+{% endfor %}
+</div>

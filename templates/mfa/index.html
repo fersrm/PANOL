@@ -1,0 +1,28 @@
+{% extends 'account/Layout/base_account.html' %}
+{% load i18n %}
+{% block head_title %}Autenticación 2FA{% endblock %}
+{% block content_account %}
+<h1>Autenticación 2FA</h1><p class="lede">Añade una segunda verificación para proteger el acceso a tu cuenta.</p>
+{% if 'totp' in MFA_SUPPORTED_TYPES %}
+<section class="mt-8" aria-labelledby="totp-title">
+  <h2 id="totp-title">Aplicación de autenticación</h2>
+  <p class="my-4">{% if authenticators.totp %}<span class="badge success">Activa</span> Tu cuenta utiliza una aplicación de autenticación.{% else %}<span class="badge">Sin activar</span> Puedes usar una aplicación que genere códigos temporales.{% endif %}</p>
+  {% if authenticators.totp %}<a class="button secondary" href="{% url 'mfa_deactivate_totp' %}">Desactivar autenticación</a>{% else %}<a class="button" href="{% url 'mfa_activate_totp' %}">Activar autenticación</a>{% endif %}
+</section>
+{% endif %}
+{% if 'recovery_codes' in MFA_SUPPORTED_TYPES %}
+<hr>
+<section aria-labelledby="recovery-title">
+  <h2 id="recovery-title">Códigos de recuperación</h2>
+  {% if authenticators.recovery_codes %}
+    {% with total_count=authenticators.recovery_codes.generate_codes|length unused_count=authenticators.recovery_codes.get_unused_codes|length %}
+      <p class="my-4">{{ unused_count }} de {{ total_count }} códigos disponibles. Guárdalos en un lugar seguro.</p>
+      {% if is_mfa_enabled %}<div class="flex flex-wrap gap-3">
+        {% if unused_count %}<a class="button secondary" href="{% url 'mfa_view_recovery_codes' %}">Ver códigos</a><a class="button secondary" href="{% url 'mfa_download_recovery_codes' %}">Descargar códigos</a>{% endif %}
+        <a class="button secondary" href="{% url 'mfa_generate_recovery_codes' %}">Generar códigos nuevos</a>
+      </div>{% endif %}
+    {% endwith %}
+  {% else %}<p class="my-4 text-muted">Se generarán al activar la autenticación 2FA.</p>{% endif %}
+</section>
+{% endif %}
+{% endblock %}

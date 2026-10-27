@@ -1,0 +1,14 @@
+{% load static %}
+<div class="relative" data-account-menu>
+  <button type="button" class="profile-button" aria-expanded="false" data-account-toggle aria-label="Abrir opciones de cuenta">
+    <img src="{% if request.user.profile.image and request.user.profile.image.name != 'profile.webp' %}{{ request.user.profile.image.url }}{% else %}{% static 'img/profile.webp' %}{% endif %}" alt="">
+    <span class="profile-name">{{ request.user }}</span>
+    <svg class="profile-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>
+  </button>
+  <div class="account-dropdown" data-account-panel hidden>
+    <a href="{% url 'Profile' %}">Editar perfil</a>
+    <a href="{% url 'account_email' %}">Correo electrónico</a>
+    <a href="{% url 'mfa_index' %}">Seguridad de la cuenta</a>
+    <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}<button type="submit">Cerrar sesión</button></form>
+  </div>
+</div>

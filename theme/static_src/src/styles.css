@@ -1,0 +1,41 @@
+@import "tailwindcss" source(none);
+
+/**
+  * Fuentes propias explícitas. Al añadir una app con clases Tailwind hay que
+  * registrar aquí sus plantillas, JavaScript y Python.
+  */
+@source "../../../templates";
+@source "../../templates";
+@source "../../../static";
+@source "../../../UsuarioApp";
+@source "../../../homeApp";
+@source "../../../core";
+@source "../../../utils";
+@source "../../../manage.py";
+
+/* No producir utilidades desde código generado ni migraciones. */
+@source not "../../../**/migrations";
+@source not "../../../**/__pycache__";
+@source not "../../../staticfiles";
+
+/* Utilidades semánticas: los valores se resuelven desde tokens.css al renderizar. */
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-soft: var(--brand-soft);
+  --color-on-brand: var(--on-brand);
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--border);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
+  --color-success-soft: var(--success-soft);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning-soft: var(--warning-soft);
+  --color-info-soft: var(--info-soft);
+  --font-sans: var(--font-ui);
+}

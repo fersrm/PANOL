@@ -1,0 +1,15 @@
+{% extends 'components/Layout/base_pages.html' %}
+{% load static tailwind_filters %}
+{% block head_title %}Editar perfil{% endblock %}
+{% block content_pages %}
+<h1>Tu perfil</h1><p class="lede">Actualiza tus datos y la imagen de tu cuenta.</p>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% include 'components/input_perfil.html' %}
+  {{ profile_form.non_field_errors }}
+  {{ user_form|crispy }}
+  {% include 'components/btn/button.html' with button_text='Guardar cambios' %}
+  {% for message in messages %}{% if 'error' in message.tags %}<p class="field-error" role="alert">{{ message }}</p>{% endif %}{% endfor %}
+</form>
+{% endblock %}
+{% block javascript %}<script defer src="{% static 'js/script.js' %}?v=002"></script>{% endblock %}

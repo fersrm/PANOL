@@ -1,0 +1,9 @@
+{% if paginator.num_pages > 1 %}
+<nav class="pagination" aria-label="Paginación de usuarios">
+  <p>Página {{ page_obj.number }} de {{ paginator.num_pages }} · {{ paginator.count }} usuarios</p>
+  <div class="pagination-actions">
+    {% if page_obj.has_previous %}<a class="button secondary" href="?page={{ page_obj.previous_page_number }}&amp;search={{ search_query|urlencode }}{% if show_inactive %}&amp;inactive=1{% endif %}#pagtable">Anterior</a>{% endif %}
+    {% if page_obj.has_next %}<a class="button secondary" href="?page={{ page_obj.next_page_number }}&amp;search={{ search_query|urlencode }}{% if show_inactive %}&amp;inactive=1{% endif %}#pagtable">Siguiente</a>{% endif %}
+  </div>
+</nav>
+{% endif %}

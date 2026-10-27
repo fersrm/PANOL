@@ -1,0 +1,11 @@
+[tool.ruff]
+# Evita que Ruff analice carpetas que no debe (como migraciones de Django o el entorno virtual)
+exclude = [
+    ".venv",
+    "venv",
+    "*/migrations/*",
+]
+
+[tool.ruff.lint]
+# Añade RUF012 a la lista de errores ignorados globalmente
+ignore = ["RUF012"]

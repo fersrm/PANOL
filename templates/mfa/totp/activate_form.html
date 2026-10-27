@@ -1,0 +1,15 @@
+{% extends 'account/Layout/base_account.html' %}
+{% load tailwind_filters allauth i18n %}
+{% block head_title %}Activar autenticación 2FA{% endblock %}
+{% block content_account %}
+<h1>Activar autenticación 2FA</h1><p class="lede">Escanea el código QR con tu aplicación de autenticación e ingresa el código que genere.</p>
+{% url 'mfa_activate_totp' as action_url %}
+{% element form form=form method='post' action=action_url %}
+  {% slot body %}{% csrf_token %}
+    <div class="my-6">{% element img src=totp_svg_data_uri alt='Código QR para configurar la autenticación' tags='mfa,totp,qr' %}{% endelement %}</div>
+    <div class="qr-personalizado">{% element field id='authenticator_secret' type='text' value=form.secret disabled=True %}{% slot label %}Clave de configuración{% endslot %}{% slot help_text %}{% translate 'You can store this secret and use it to reinstall your authenticator app at a later time.' %}{% endslot %}{% endelement %}</div>
+    {{ form|crispy }}
+  {% endslot %}
+  {% slot actions %}{% include 'components/btn/button.html' with button_text='Activar autenticación' %}{% endslot %}
+{% endelement %}
+{% endblock %}

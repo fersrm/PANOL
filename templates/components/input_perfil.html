@@ -1,0 +1,12 @@
+{% load static %}
+<div class="avatar-field">
+  <label for="id_image">Imagen de perfil</label>
+  <div class="avatar-control">
+    <img src="{% if profile_form.instance.image and profile_form.instance.image.name != 'profile.webp' %}{{ profile_form.instance.image.url }}{% else %}{% static 'img/profile.webp' %}{% endif %}" alt="Imagen actual de perfil" width="64" height="64">
+    {{ profile_form.image }}
+    <button type="button" id="customImageButton" class="button secondary">Cambiar imagen</button>
+  </div>
+  <small>Imagen opcional. Tamaño máximo: 5 MB.</small>
+  <span id="nameImg" class="block text-sm text-muted break-all" aria-live="polite"></span>
+  {{ profile_form.image.errors }}
+</div>

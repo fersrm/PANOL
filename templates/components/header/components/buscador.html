@@ -1,0 +1,6 @@
+<form class="search-form" action="{% url 'User' %}" method="get">
+  <label for="search-field">Buscar usuarios</label>
+  <input id="search-field" placeholder="{{ placeholder }}" type="search" name="search" value="{{ search_query }}">
+  {% if show_inactive %}<input type="hidden" name="inactive" value="1">{% endif %}
+  <button type="submit" class="button secondary">Buscar</button>
+</form>

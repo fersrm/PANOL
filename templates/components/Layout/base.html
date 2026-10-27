@@ -1,0 +1,27 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="es" data-mode="{% if modo_visual == 'dark' %}dark{% else %}light{% endif %}">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {% block extra_meta %}{% endblock %}
+    <title>{% block head_title %}Inicio{% endblock %} · Plataforma</title>
+    <link rel="stylesheet" href="{% static 'css/tokens.css' %}?v=003">
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20261005-center">
+    <link rel="stylesheet" href="{% static 'css/mensajes.css' %}?v=002">
+    <link rel="stylesheet" href="{% static 'css/spiner.css' %}?v=002">
+    <link rel="icon" href="{% static 'img/logo.svg' %}" type="image/svg+xml">
+    {% block extra_css %}{% endblock %}
+    <script defer src="{% static 'js/interfaz.js' %}?v=002"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.17.4/dist/cdn.min.js" integrity="sha384-5/joNqFnRyVWzXp99bHot6RHG+EksGp+USSgZwPar7T9SD9PKKER37n/8bXBAZGd" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.16/purify.min.js" integrity="sha384-a7SzOxErzJ3ZpQz0zJ32d67dSitNzPcbfybc/ykU9KJhMgZkwqfSxlhhdJRS+XGL" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script defer src="{% static 'js/mensajes.js' %}?v=002"></script>
+    {% block javascript %}{% endblock %}
+  </head>
+  <body class="{% block body_class %}bg-page text-ink min-h-dvh{% endblock %}">
+    <a class="skip-link" href="#content-start">Ir al contenido</a>
+    <div id="content-start" tabindex="-1">{% block content %}{% endblock %}</div>
+    {% include 'components/mensajes.html' %}
+  </body>
+</html>

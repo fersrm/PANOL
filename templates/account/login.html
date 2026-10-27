@@ -1,0 +1,22 @@
+{% extends 'components/Layout/base.html' %}
+{% load static tailwind_filters i18n allauth account %}
+{% block head_title %}Iniciar sesión{% endblock %}
+{% block content %}
+<main class="auth-layout">
+  <section class="auth-story" aria-labelledby="auth-story-title"><div class="auth-story-content"><div class="brand-rule" aria-hidden="true"></div><h2 id="auth-story-title">Todo listo para continuar.</h2><p>Accede a tu espacio de trabajo y administra tu cuenta desde un mismo lugar.</p></div></section>
+  <section class="auth-form-area" aria-labelledby="login-title"><div class="form-panel">
+    <img class="auth-logo" src="{% static 'img/logo.svg' %}" alt="">
+    <h1 id="login-title">Iniciar sesión</h1><p class="lede">Ingresa tus datos para acceder a la plataforma.</p>
+    {% if not SOCIALACCOUNT_ONLY %}
+      {% url 'account_login' as login_url %}
+      {% element form form=form method='post' action=login_url tags='entrance,login' %}
+        {% slot body %}{% csrf_token %}{{ form|crispy }}{{ redirect_field }}{% endslot %}
+        {% slot actions %}{% include 'components/btn/button.html' with button_text='Iniciar sesión' button_class='prominent login' %}<p class="mt-5"><a class="text-link" href="{% url 'account_reset_password' %}">¿Olvidaste tu contraseña?</a></p>{% endslot %}
+      {% endelement %}
+    {% endif %}
+    {% if LOGIN_BY_CODE_ENABLED %}<p class="mt-5"><a class="button secondary full" href="{{ request_login_code_url }}">Recibir código de acceso</a></p>{% endif %}
+    {% if SOCIALACCOUNT_ENABLED %}{% include 'socialaccount/snippets/login.html' with page_layout='entrance' %}{% endif %}
+    <p class="auth-footnote">Usa la cuenta proporcionada por tu administrador.</p>
+  </div></section>
+</main>
+{% endblock %}

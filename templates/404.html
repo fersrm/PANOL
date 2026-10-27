@@ -1,0 +1,3 @@
+{% extends 'components/Layout/base.html' %}
+{% block head_title %}No encontramos esta página{% endblock %}
+{% block content %}<main class="public-page"><div class="error-page"><p class="error-code">404</p><h1>No encontramos esta página</h1><p>La dirección puede haber cambiado. Vuelve al inicio para continuar.</p>{% if request.user.is_authenticated %}<a href="{% url 'Home' %}" class="button">Volver al inicio</a>{% else %}<a href="{% url 'account_login' %}" class="button">Iniciar sesión</a>{% endif %}</div></main>{% endblock %}

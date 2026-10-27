@@ -1,0 +1,68 @@
+/* Identidad del proyecto. Cambiar colores SOLO aquí; ver docs/PERSONALIZACION_VISUAL.md.
+   Pares claro/oscuro: ciruela #7e22ce/#c084fc; cobre #9a3412/#fdba74.
+   Editar --brand-light/--brand-dark y sus --on-brand-* juntos. Revisar contraste.
+   Modificar valores no requiere recompilar Tailwind; añadir utilidades sí. */
+:root {
+  --brand-light: #0f766e;
+  --brand-dark: #5eead4;
+  --on-brand-light: #ffffff;
+  --on-brand-dark: #102124;
+  --brand: var(--brand-light);
+  --on-brand: var(--on-brand-light);
+  --brand-hover: color-mix(in srgb, var(--brand), #000000 18%);
+  --brand-soft: color-mix(in srgb, var(--brand) 9%, var(--surface));
+  --page: #f2f5f8;
+  --surface: #ffffff;
+  --surface-muted: #eaf0f5;
+  --qr-surface: #ffffff;
+  --ink: #182536;
+  --muted: #506177;
+  --border: #d9e2ea;
+  --control-border: #758599;
+  --focus: var(--brand);
+  --success: #166534;
+  --success-soft: #ecfdf3;
+  --danger: #b42318;
+  --on-danger: #ffffff;
+  --danger-hover: color-mix(in srgb, var(--danger), #000000 15%);
+  --danger-soft: #fff1f0;
+  --warning: #854d0e;
+  --warning-soft: #fef9e8;
+  --info: #1e40af;
+  --info-soft: #eff6ff;
+  --chart-1: var(--brand);
+  --chart-2: #596d94;
+  --chart-3: #9a3412;
+  --overlay: rgb(24 37 54 / 48%);
+  --shadow: 0 12px 40px rgb(24 37 54 / 12%);
+  --font-ui: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --motion-fast: 140ms;
+  --motion-panel: 220ms;
+}
+
+html[data-mode="dark"] {
+  --brand: var(--brand-dark);
+  --on-brand: var(--on-brand-dark);
+  --brand-hover: color-mix(in srgb, var(--brand), #ffffff 12%);
+  --page: #101923;
+  --surface: #182536;
+  --surface-muted: #203044;
+  --ink: #e8eef5;
+  --muted: #b0becf;
+  --border: #33445a;
+  --control-border: #7a8fa7;
+  --success: #86efac;
+  --success-soft: #18372d;
+  --danger: #fda29b;
+  --on-danger: #32120f;
+  --danger-soft: #38262f;
+  --warning: #facc15;
+  --warning-soft: #35321f;
+  --info: #93c5fd;
+  --info-soft: #203449;
+  --chart-2: #b9c9ec;
+  --chart-3: #fdba74;
+  --overlay: rgb(0 0 0 / 65%);
+  --shadow: 0 12px 40px rgb(0 0 0 / 28%);
+}
+
