@@ -27,18 +27,30 @@ Sin instalar el esquema, Inicio informa que el resumen del pañol no está dispo
 
 ## Instalar
 
-Requiere Python 3.12. Desde la carpeta de este proyecto, crea un entorno virtual e instala las dependencias. En Linux:
+Versión verificada: **Python 3.12.16 y Django 5.2.18 LTS**. `.python-version` registra el runtime esperado; no actualiza automáticamente un Python ya instalado. Clona el proyecto:
+
+```bash
+git clone --depth 1 --single-branch --branch main https://github.com/fersrm/PANOL.git
+cd PANOL
+```
+
+Con Python 3.12.16 instalado, crea un entorno virtual e instala las dependencias. En Linux:
 
 ```bash
 python3.12 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements.txt
+python -m pip install --upgrade pip==26.2.2
+python -m pip install --require-hashes -r requirements.txt
 python -m pip check
 ```
 
-En Windows crea el entorno con `py -3.12 -m venv .venv` y actívalo con `.\.venv\Scripts\Activate.ps1`. Después ejecuta los mismos comandos de instalación y comprobación de dependencias.
+En Windows comprueba primero `py -3.12 --version`: debe indicar 3.12.16. Crea el entorno con `py -3.12 -m venv .venv` y actívalo con `.\.venv\Scripts\Activate.ps1`. Después ejecuta los mismos comandos de instalación y comprobación de dependencias. Si usas uv para obtener el runtime parcheado, `uv venv --python 3.12.16 --seed .venv` prepara el entorno; no copies entornos de otros equipos.
 
-Las versiones Python están fijadas en `requirements.txt`; no copies entornos virtuales entre equipos. Tailwind 4.3.0 usa un binario standalone, sin npm/Node.js. Su CSS compilado se conserva en `theme/static/css/dist/styles.css`.
+Para actualizar una instalación existente, conserva el entorno anterior y valida uno nuevo antes de sustituirlo. En esta copia la corrección se comprobó en `.venv-produccion` (Python 3.12.16); `.venv` quedó intacto. Para usar el nuevo entorno local: `.\.venv-produccion\Scripts\Activate.ps1`. Este cambio de entorno no aplica migraciones ni cambia la base de datos.
+
+El runtime local descargado para ese entorno está en `.work-panol/python`; consérvalo mientras uses `.venv-produccion`, o recrea el entorno sobre una instalación estable de Python 3.12.16. Ninguno de esos directorios se publica en Git.
+
+`requirements.txt` fija 51 paquetes de aplicación, herramientas, opcionales y transitivas, con hashes SHA-256 de sus distribuciones de PyPI para Windows/Linux. Conserva los hashes al actualizar; `pip freeze` por sí solo no los regenera. Tailwind 4.3.0 usa un binario standalone, sin npm/Node.js. Su CSS compilado se conserva en `theme/static/css/dist/styles.css`.
 
 ## Configuración de cada instalación
 
@@ -105,7 +117,7 @@ python manage.py runserver
 
 ## CI y verificación local
 
-La verificación local usa `core.test_settings` y nunca la base de desarrollo. Esta copia no incluye un workflow de CI; los antecedentes de CI de Base-2 no certifican este derivado.
+La verificación usa `core.test_settings` y nunca la base de desarrollo. El workflow [CI Django](.github/workflows/ci.yml) se ejecutará en push a `main`, pull requests hacia `main` y ejecución manual, una vez publicado. Usa Ubuntu 24.04/Python 3.12.16, instalación con hashes, `pip check` y los comandos siguientes. Las acciones están fijadas por SHA, con permisos de lectura y checkout sin credenciales persistentes. No realiza despliegues ni necesita secretos de producción.
 
 ```bash
 python manage.py check --settings=core.test_settings
@@ -113,7 +125,7 @@ python manage.py makemigrations --check --dry-run --settings=core.test_settings
 python manage.py test UsuarioApp homeApp PanolApp --noinput --settings=core.test_settings
 ```
 
-`core.test_settings` no lee `.env`: utiliza SQLite en memoria, correo/caché locales y archivos temporales. La suite verificada contiene 122 pruebas: 77 de la base (actualizando las expectativas del gráfico solicitado) y 45 del pañol, incluidas concurrencia, navegación y migración/reversión ficticia. Las pruebas no aplican migraciones a tu base existente ni despliegan el proyecto.
+`core.test_settings` no lee `.env`: utiliza SQLite en memoria, correo/caché locales y archivos temporales. La suite verificada localmente con las dependencias corregidas contiene 122 pruebas: 77 de la base y 45 del pañol, incluidas concurrencia, navegación y migración/reversión ficticia. El workflow pasó actionlint; su primera ejecución en GitHub queda pendiente de publicar los cambios. Las pruebas no aplican migraciones a tu base existente ni despliegan el proyecto.
 
 ## Preparar el servidor
 
