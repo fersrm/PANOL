@@ -15,6 +15,9 @@
   --surface: #ffffff;
   --surface-muted: #eaf0f5;
   --qr-surface: #ffffff;
+  --auth-story-surface: #123e40;
+  --auth-story-ink: #f2fffc;
+  --auth-story-muted: #bed8d4;
   --ink: #182536;
   --muted: #506177;
   --border: #d9e2ea;

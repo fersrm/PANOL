@@ -11,7 +11,7 @@ from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import never_cache
 from django.views.decorators.debug import sensitive_post_parameters, sensitive_variables
-from django.views.generic import ListView, View
+from django.views.generic import ListView, TemplateView, View
 
 from utils.customer_img import discard_new_profile_image
 
@@ -29,6 +29,13 @@ from .permissions import (
     UserRegistrationMixin,
     puede_gestionar_cuenta,
 )
+
+
+class PasswordRecoveryHelpView(TemplateView):
+    """La recuperación de este producto se realiza por un administrador."""
+
+    template_name = "account/password_reset.html"
+    http_method_names = ["get", "head", "options"]
 
 
 class VisualModeUpdateView(LoginRequiredMixin, View):

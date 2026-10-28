@@ -1158,7 +1158,7 @@ class RenovacionCuentaTests(BaseUsuariosTestCase):
         self.client.post(reverse("account_logout"))
         self.assertNotIn("_auth_user_id", self.client.session)
 
-    def test_recuperacion_y_password_conservan_validacion(self):
+    def test_recuperacion_deriva_a_admin_y_password_conserva_validacion(self):
         actor = self.create_actor("flujo_password", position=self.restricted_position)
         actor.email = "flujo-password@example.test"
         actor.save(update_fields=["email"])
@@ -1168,8 +1168,8 @@ class RenovacionCuentaTests(BaseUsuariosTestCase):
         response = self.client.post(
             reverse("account_reset_password"), {"email": actor.email}
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(len(mail.outbox), 0)
         self.client.force_login(actor)
         invalid = self.client.post(
             reverse("account_change_password"),

@@ -1,3 +1,4 @@
+from allauth.account.forms import LoginForm
 from django import forms
 from django.contrib.auth.forms import SetPasswordForm, UserCreationForm
 from django.contrib.auth.models import User
@@ -8,6 +9,14 @@ from django.views.decorators.debug import sensitive_variables
 
 from .models import Position, Profile, UserVisualPreference
 from .permissions import cargos_asignables
+
+
+class PanolLoginForm(LoginForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # La orientación administrativa se muestra una vez, fuera del formulario.
+        if "password" in self.fields:
+            self.fields["password"].help_text = ""
 
 
 class VisualModeForm(forms.Form):

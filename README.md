@@ -15,6 +15,8 @@ ADMIN y MANAGER administran inventario, kits, solicitudes, entregas y devolucion
 
 Inicio conserva la tabla de actividad de usuarios, permanece primero en el menú y muestra cifras reales: globales para operadores y propias para solicitantes. Movimientos conserva operador, fecha, motivo y documento de origen. No se incluyen datos/cuentas iniciales del ZIP externo ni solicitudes públicas sin cuenta.
 
+Si olvidaste tu contraseña, usa la ayuda del login y comunícate con el administrador de la plataforma. Este proyecto no envía enlaces de recuperación por correo; las URLs antiguas muestran la misma orientación y no aceptan restablecimientos por token. El administrador autorizado conserva la acción de restablecimiento del listado de usuarios. El menú de cuenta incluye perfil, seguridad y cierre de sesión, sin acceso a correo electrónico. El cambio de tu propia contraseña con sesión y MFA siguen disponibles.
+
 ### Instalar el nuevo esquema en una base existente
 
 La migración `PanolApp/0001_initial.py` está incluida y fue ensayada con datos ficticios en SQLite temporal. No se ha aplicado a la base local existente por esta entrega. Después de respaldar y elegir explícitamente la base de destino, usa el entorno configurado:
@@ -125,7 +127,7 @@ python manage.py makemigrations --check --dry-run --settings=core.test_settings
 python manage.py test UsuarioApp homeApp PanolApp --noinput --settings=core.test_settings
 ```
 
-`core.test_settings` no lee `.env`: utiliza SQLite en memoria, correo/caché locales y archivos temporales. La suite verificada localmente con las dependencias corregidas contiene 122 pruebas: 77 de la base y 45 del pañol, incluidas concurrencia, navegación y migración/reversión ficticia. El workflow pasó actionlint; su primera ejecución en GitHub queda pendiente de publicar los cambios. Las pruebas no aplican migraciones a tu base existente ni despliegan el proyecto.
+`core.test_settings` no lee `.env`: utiliza SQLite en memoria, correo/caché locales y archivos temporales. La suite verificada localmente contiene 127 pruebas: 82 de la base/acceso y 45 del pañol, incluidas recuperación administrativa sin correo, concurrencia, navegación y migración/reversión ficticia. El workflow pasó actionlint; la ejecución de estos cambios en GitHub queda pendiente de publicarlos. Las pruebas no aplican migraciones a tu base existente ni despliegan el proyecto.
 
 ## Preparar el servidor
 

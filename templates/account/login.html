@@ -2,21 +2,33 @@
 {% load static tailwind_filters i18n allauth account %}
 {% block head_title %}Iniciar sesión{% endblock %}
 {% block content %}
-<main class="auth-layout">
-  <section class="auth-story" aria-labelledby="auth-story-title"><div class="auth-story-content"><div class="brand-rule" aria-hidden="true"></div><h2 id="auth-story-title">Todo listo para continuar.</h2><p>Accede a tu espacio de trabajo y administra tu cuenta desde un mismo lugar.</p></div></section>
+<main class="auth-layout panol-login">
+  <section class="auth-story" aria-labelledby="auth-story-title">
+    <div class="auth-story-content">
+      <p class="auth-story-name">Pañol de informática</p>
+      <h2 id="auth-story-title">El material listo.<br>Todo en su lugar.</h2>
+      <p>Organiza materiales, prepara kits y gestiona tus préstamos.</p>
+      <img class="auth-illustration" src="{% static 'img/login-panol.svg' %}" alt="" aria-hidden="true" width="640" height="440">
+      <p class="auth-story-caption">Un espacio para equipar tus próximas ideas.</p>
+    </div>
+  </section>
   <section class="auth-form-area" aria-labelledby="login-title"><div class="form-panel">
-    <img class="auth-logo" src="{% static 'img/logo.svg' %}?v=panol-1" alt="">
-    <h1 id="login-title">Iniciar sesión</h1><p class="lede">Ingresa tus datos para acceder a la plataforma.</p>
+    <div class="auth-brand-row"><div class="auth-brand"><img class="auth-logo" src="{% static 'img/logo.svg' %}?v=panol-1" alt="" width="48" height="48"><span>Pañol de<br>informática</span></div><img class="auth-mobile-art" src="{% static 'img/login-panol.svg' %}" alt="" width="104" height="72"></div>
+    <h1 id="login-title">Bienvenido al pañol</h1><p class="lede">Inicia sesión para preparar tu próximo pedido.</p>
     {% if not SOCIALACCOUNT_ONLY %}
       {% url 'account_login' as login_url %}
       {% element form form=form method='post' action=login_url tags='entrance,login' %}
         {% slot body %}{% csrf_token %}{{ form|crispy }}{{ redirect_field }}{% endslot %}
-        {% slot actions %}{% include 'components/btn/button.html' with button_text='Iniciar sesión' button_class='prominent login' %}<p class="mt-5"><a class="text-link" href="{% url 'account_reset_password' %}">¿Olvidaste tu contraseña?</a></p>{% endslot %}
+        {% slot actions %}{% include 'components/btn/button.html' with button_text='Iniciar sesión' button_class='prominent login' %}{% endslot %}
       {% endelement %}
+      <details class="auth-recovery">
+        <summary>¿Olvidaste tu contraseña?</summary>
+        <p>Para restablecer tu contraseña, comunícate con el administrador de la plataforma.</p>
+      </details>
     {% endif %}
     {% if LOGIN_BY_CODE_ENABLED %}<p class="mt-5"><a class="button secondary full" href="{{ request_login_code_url }}">Recibir código de acceso</a></p>{% endif %}
     {% if SOCIALACCOUNT_ENABLED %}{% include 'socialaccount/snippets/login.html' with page_layout='entrance' %}{% endif %}
-    <p class="auth-footnote">Usa la cuenta proporcionada por tu administrador.</p>
+    <p class="auth-footnote">Accede con la cuenta que te proporcionó tu administrador.</p>
   </div></section>
 </main>
 {% endblock %}

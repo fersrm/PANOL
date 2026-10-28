@@ -123,4 +123,5 @@ ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 3
 ACCOUNT_LOGOUT_ON_GET = False
 ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login/"
 ACCOUNT_ADAPTER = "UsuarioApp.adapters.NoSignupAccountAdapter"
+ACCOUNT_FORMS = {"login": "UsuarioApp.forms.PanolLoginForm"}
 SESSION_COOKIE_AGE = 1800

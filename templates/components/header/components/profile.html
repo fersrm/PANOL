@@ -7,7 +7,6 @@
   </button>
   <div class="account-dropdown" data-account-panel hidden>
     <a href="{% url 'Profile' %}">Editar perfil</a>
-    <a href="{% url 'account_email' %}">Correo electrónico</a>
     <a href="{% url 'mfa_index' %}">Seguridad de la cuenta</a>
     <form method="post" action="{% url 'account_logout' %}">{% csrf_token %}<button type="submit">Cerrar sesión</button></form>
   </div>

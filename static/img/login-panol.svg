@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="440" viewBox="0 0 640 440" fill="none">
+  <title>Equipos y materiales del pañol de informática</title>
+  <g stroke="#80b7ad" stroke-width="1" opacity=".25">
+    <path d="M24 380h592M56 416h528M96 52v342M544 52v342"/>
+    <circle cx="560" cy="65" r="30"/><circle cx="560" cy="65" r="19"/>
+    <path d="M48 110h48m448 0h48M48 125h22m522 0h-22"/>
+  </g>
+  <!-- Estantería de herramientas y cajas de materiales. -->
+  <rect x="106" y="49" width="328" height="274" rx="12" fill="#174e4e" stroke="#73b4a5" stroke-width="2"/>
+  <path d="M124 68v284m292-284v284M124 175h292M124 286h292" stroke="#8dc7b8" stroke-width="6" stroke-linecap="round"/>
+  <path d="M132 183h276M132 294h276" stroke="#0e3338" stroke-width="8"/>
+  <g stroke="#a3e4ce" stroke-width="2.5" stroke-linejoin="round">
+    <rect x="148" y="101" width="98" height="66" rx="5" fill="#25665e"/>
+    <path d="M148 121h98m-70-20v29l21-10 21 10v-29"/>
+    <rect x="268" y="112" width="120" height="55" rx="5" fill="#367f70"/>
+    <rect x="307" y="104" width="42" height="8" rx="3" fill="#acdccc"/>
+    <path d="M268 132h120m-69-4v12h18v-12"/>
+  </g>
+  <rect x="148" y="207" width="54" height="70" rx="5" fill="#c4ddd2"/>
+  <path d="M159 220h32m-32 12h32m-32 12h18" stroke="#39766a" stroke-width="3" stroke-linecap="round"/>
+  <g stroke="#80c8b0" stroke-width="3" stroke-linecap="round">
+    <path d="M241 221c-20-16-30 17-10 23 18 6 23 23 5 26-24 4-31-31-9-53 12-12 34 0 31 15-2 10-15 7-17-11Z"/>
+    <path d="m259 237 13 20h13m-6-5 6 5-6 5"/>
+  </g>
+  <g stroke="#b7dfce" stroke-width="2.5" stroke-linecap="round">
+    <path d="M311 206v41m-6-36h12m-6 36v21"/>
+    <rect x="304" y="238" width="14" height="35" rx="5" fill="#d5b886" stroke="none"/>
+    <path d="m341 205 8 13-4 8 15 39m-25-56-2 13 8 6 16 39"/>
+    <path d="M382 208v64m-5-59h10m-10 11h10m-10 11h10m-10 11h10"/>
+  </g>
+  <!-- Equipo portátil y gabinete sobre el banco. -->
+  <path d="M72 354h484v17H72z" fill="#83b6a4"/>
+  <path d="M96 372v35m436-35v35" stroke="#71a794" stroke-width="10" stroke-linecap="round"/>
+  <rect x="161" y="257" width="221" height="87" rx="8" fill="#10383c" stroke="#a7deca" stroke-width="3"/>
+  <rect x="171" y="267" width="201" height="65" rx="3" fill="#215954"/>
+  <path d="m242 286-12 13 12 13m59-26 12 13-12 13m-26-27-8 30" stroke="#9ce3c7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m161 344-25 10h273l-27-10H161Z" fill="#c2e4d5"/>
+  <path d="M252 344h40l5 5h-50l5-5Z" fill="#558c7e"/>
+  <rect x="450" y="217" width="92" height="137" rx="8" fill="#25635d" stroke="#9ed7be" stroke-width="2.5"/>
+  <path d="M464 234h37m-37 10h37m-37 10h37" stroke="#8fc4af" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="519" cy="236" r="4" fill="#d8bf90"/>
+  <circle cx="496" cy="303" r="24" stroke="#82baa4" stroke-width="2"/>
+  <circle cx="496" cy="303" r="12" stroke="#82baa4" stroke-width="2"/>
+  <path d="m479 286 34 34m0-34-34 34" stroke="#82baa4" stroke-width="2"/>
+  <path d="M560 314h29v40h-29z" fill="#c6ac7d"/>
+  <path d="m565 307 5-22m4 22 10-31m-2 31 12-20" stroke="#b9d9c8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M45 403h550" stroke="#74ae9d" stroke-width="2" stroke-linecap="round"/>
+</svg>
