@@ -24,6 +24,7 @@ from django.test import (
     TestCase,
     TransactionTestCase,
     override_settings,
+    tag,
 )
 from django.urls import reverse
 from PIL import Image
@@ -568,6 +569,7 @@ class AdministracionUsuariosTests(BaseUsuariosTestCase):
 
 
 class ConfiguracionAisladaTests(TestCase):
+    @tag("sqlite_settings")
     def test_recursos_de_prueba_estan_aislados(self):
         database = settings.DATABASES["default"]
         self.assertEqual(database["TEST"]["NAME"], ":memory:")

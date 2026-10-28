@@ -12,6 +12,7 @@ from django.utils import timezone
 from .models import (
     Articulo,
     Carrito,
+    Categoria,
     ComponenteKit,
     Devolucion,
     Kit,
@@ -410,7 +411,9 @@ def descontar(actor, prestamo, lineas):
         if not Articulo.objects.filter(
             pk=articulo.pk,
             activo=True,
-            categoria__activo=True,
+            # Evita un JOIN que movería el saldo a una subconsulta de IDs:
+            # PostgreSQL debe revalidarlo al adquirir el bloqueo del UPDATE.
+            categoria_id__in=Categoria.objects.filter(activo=True).values("pk"),
             disponible__gte=cantidad,
         ).update(disponible=F("disponible") - cantidad):
             raise ValidationError(
