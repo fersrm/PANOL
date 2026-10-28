@@ -127,7 +127,7 @@ python manage.py makemigrations --check --dry-run --settings=core.test_settings
 python manage.py test UsuarioApp homeApp PanolApp --noinput --settings=core.test_settings
 ```
 
-`core.test_settings` no lee `.env`: utiliza SQLite en memoria, correo/caché locales y archivos temporales. La suite verificada localmente contiene 127 pruebas: 82 de la base/acceso y 45 del pañol, incluidas recuperación administrativa sin correo, concurrencia, navegación y migración/reversión ficticia. El workflow pasó actionlint; la ejecución de estos cambios en GitHub queda pendiente de publicarlos. Las pruebas no aplican migraciones a tu base existente ni despliegan el proyecto.
+`core.test_settings` no lee `.env`: utiliza SQLite en memoria, correo/caché locales y archivos temporales. La suite verificada contiene 127 pruebas: 82 de la base/acceso y 45 del pañol, incluidas recuperación administrativa sin correo, concurrencia, navegación y migración/reversión ficticia. El workflow pasó actionlint y las pruebas también se comprobaron en GitHub Actions. Consulta las ejecuciones de cada commit en [CI Django](https://github.com/fersrm/PANOL/actions/workflows/ci.yml). Las pruebas no aplican migraciones a tu base existente ni despliegan el proyecto.
 
 ## Preparar el servidor
 
