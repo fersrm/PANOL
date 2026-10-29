@@ -242,6 +242,109 @@ class AcademicoTests(Base):
             sum(r["veces"] for r in filas if r["origen"] == "estudiante"), 1
         )
 
+    def test_docentes_restricted_y_cambio_de_cargo(self):
+        from PanolApp.academico import DocenteForm
+        from PanolApp.forms import SolicitudForm
+        from PanolApp.permissions import es_docente
+
+        for user in [
+            self.admin,
+            self.manager,
+            self.root,
+            self.sin_perfil,
+            self.inactivo,
+        ]:
+            self.assertFalse(es_docente(user))
+            self.assertFalse(DocenteForm({"docente": user.pk}).is_valid())
+            with self.assertRaises(ValidationError):
+                cambiar_plan(self.admin, self.plan.pk, 1, "docente", user)
+        self.assertTrue(DocenteForm({"docente": self.persona.pk}).is_valid())
+        self.pedir()
+        self.persona.profile.position_FK = self.manager.profile.position_FK
+        self.persona.profile.save()
+        self.assertFalse(
+            SolicitudForm()
+            .fields["docencia"]
+            .queryset.filter(pk=self.docencia.pk)
+            .exists()
+        )
+        with self.assertRaises(ValidationError):
+            self.pedir()
+        self.assertEqual(sum(r["veces"] for r in seguimiento(self.admin, {})[0]), 1)
+
+    def test_catalogos_equipamiento_y_alias(self):
+        self.client.force_login(self.admin)
+        r = self.client.get(reverse("panol:catalogo", args=["asignaturas"]))
+        self.assertContains(
+            r,
+            reverse("panol:catalogo_equipamiento")
+            + "?asignatura="
+            + str(self.asignatura.pk),
+        )
+        r = self.client.get(
+            reverse("panol:catalogo_equipamiento"), {"asignatura": self.asignatura.pk}
+        )
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.context["asignatura_elegida"], self.asignatura)
+        self.assertEqual(
+            self.client.get(
+                reverse("panol:catalogo_equipamiento"), {"asignatura": "no-valido"}
+            ).status_code,
+            404,
+        )
+        self.assertContains(r, 'aria-current="page"')
+        urls = [
+            reverse("panol:catalogo_equipamiento"),
+            reverse("panol:catalogo_equipamiento_plan", args=[self.plan.pk]),
+            reverse("panol:academico_config"),
+            reverse("panol:academico_plan", args=[self.plan.pk]),
+        ]
+        for url in urls:
+            r = self.client.get(url)
+            self.assertEqual(r.context["seccion_panol"], "catalogos")
+            self.assertEqual(r.status_code, 200)
+        self.client.force_login(self.manager)
+        for url in urls:
+            self.assertEqual(self.client.get(url).status_code, 403)
+            self.assertEqual(self.client.post(url, {}).status_code, 403)
+
+    def test_equipamiento_sin_docentes_y_mensaje_historico(self):
+        self.docencia.delete()
+        self.client.force_login(self.admin)
+        url = reverse("panol:catalogo_equipamiento_plan", args=[self.plan.pk])
+        self.assertEqual(
+            self.client.post(
+                url, {"accion": "agregar", "revision": 1, "articulo": self.cable.pk}
+            ).status_code,
+            302,
+        )
+        self.assertTrue(self.plan.equipamiento.filter(articulo=self.cable).exists())
+        s = Solicitud.objects.create(
+            propietario=self.persona,
+            tipo="docente",
+            motivo="Anterior",
+            fecha_necesaria=timezone.localdate(),
+            profesor="Pepe",
+            clave=uuid.uuid4(),
+            carrera=self.carrera,
+            asignatura=self.asignatura,
+        )
+        r = self.client.get(reverse("panol:solicitud", args=[s.pk]))
+        self.assertContains(r, "Docente informado")
+        self.assertContains(r, "antes de vincular docentes")
+        self.assertNotContains(r, "asociación verificable")
+        self.assertEqual(seguimiento(self.admin, {"carrera": self.carrera})[1], 1)
+        self.assertEqual(seguimiento(self.admin, {"docente": self.persona})[1], 0)
+
+    def test_pestanas_y_acciones_inactividad(self):
+        self.client.force_login(self.admin)
+        for nombre in ["academico", "academico_adicionales", "academico_inactividad"]:
+            url = reverse("panol:" + nombre)
+            r = self.client.get(url)
+            self.assertContains(r, 'href="' + url + '" aria-current="page"')
+            self.assertEqual(r.context["seccion_panol"], "academico")
+        self.assertContains(r, 'class="academic-filter-actions"')
+
 
 class MigracionAcademicaTests(TransactionTestCase):
     def test_legado_conserva_stock_y_alta_desconocida(self):

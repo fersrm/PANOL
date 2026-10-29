@@ -35,9 +35,6 @@ def permisos_navegacion(request):
             "academico",
             "academico_adicionales",
             "academico_inactividad",
-            "academico_config",
-            "academico_plan",
-            "academico_periodo",
         ),
         "inventario": (
             "inventario",
@@ -52,7 +49,17 @@ def permisos_navegacion(request):
         "solicitudes": ("solicitudes", "solicitud", "enviar"),
         "prestamos": ("prestamos", "prestamo", "directo", "devolver"),
         "movimientos": ("consultas",),
-        "catalogos": ("catalogo", "catalogo_nuevo", "catalogo_editar"),
+        "catalogos": (
+            "catalogo",
+            "catalogo_nuevo",
+            "catalogo_editar",
+            "academico_config",
+            "academico_plan",
+            "academico_periodo",
+            "catalogo_equipamiento",
+            "catalogo_equipamiento_plan",
+            "catalogo_equipamiento_periodo",
+        ),
     }
     match = getattr(request, "resolver_match", None)
     seccion = (
@@ -66,6 +73,9 @@ def permisos_navegacion(request):
 
     return {
         "seccion_panol": seccion,
+        "catalogo_activo": (match.kwargs.get("tipo") or "equipamiento")
+        if match and seccion == "catalogos"
+        else None,
         "puede_academico": puede_academico(request.user),
         "puede_usar_panol": puede_solicitar(request.user),
         "puede_operar_panol": puede_operar(request.user),

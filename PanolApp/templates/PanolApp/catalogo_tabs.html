@@ -1,0 +1,6 @@
+<nav class="panol-tabs" aria-label="Catálogos del pañol">
+<a href="{% url 'panol:catalogo' 'categorias' %}" {% if catalogo_activo == 'categorias' %}aria-current="page"{% endif %}>Categorías</a>
+<a href="{% url 'panol:catalogo' 'areas' %}" {% if catalogo_activo == 'areas' %}aria-current="page"{% endif %}>Áreas</a>
+<a href="{% url 'panol:catalogo' 'carreras' %}" {% if catalogo_activo == 'carreras' %}aria-current="page"{% endif %}>Carreras</a>
+<a href="{% url 'panol:catalogo' 'asignaturas' %}" {% if catalogo_activo == 'asignaturas' %}aria-current="page"{% endif %}>Asignaturas</a>
+{% if puede_academico %}<a href="{% url 'panol:catalogo_equipamiento' %}" {% if catalogo_activo == 'equipamiento' %}aria-current="page"{% endif %}>Equipamiento por asignatura</a>{% endif %}</nav>

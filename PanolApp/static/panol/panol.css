@@ -76,3 +76,46 @@
 @container (min-width: 640px) { .panol-catalog-row { grid-template-columns: minmax(0, 1fr) 252px; } .panol-catalog-controls--single { justify-content: end; } }
 @container (max-width: 440px) { .panol-catalog-fields { grid-template-columns: minmax(0, 1fr); } .panol-catalog-controls { grid-template-columns: 96px minmax(0, 1fr); } .panol-catalog-controls--single { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) { .panol-catalog { padding: 20px 16px; } }
+
+/* Navegación local y lectura de información académica. */
+.panol-tabs { display:flex; flex-wrap:wrap; gap:10px; margin:0 0 24px; }
+.panol-tabs a { display:inline-flex; align-items:center; min-height:44px; padding:10px 16px; border:1px solid var(--control-border); border-radius:8px; color:var(--ink); font-weight:600; text-decoration:none; }
+.panol-tabs a:hover { background:var(--brand-soft); border-color:var(--brand); }
+.panol-tabs a[aria-current=page] { color:var(--on-brand); background:var(--brand); border-color:var(--brand); }
+.panol-tabs a:focus-visible { outline:2px solid var(--focus); outline-offset:3px; }
+.academic-section { padding:24px; min-width:0; }
+.academic-heading { display:grid; gap:10px; margin-bottom:24px; }
+.academic-section h2, .academic-section h3 { margin:0; line-height:1.4; }
+.academic-section h2 { font-size:1.25rem; }
+.academic-section h3 { font-size:1rem; }
+.academic-heading p, .academic-item p { margin:4px 0; color:var(--muted); }
+.academic-list { margin:16px 0; }
+.academic-item { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; padding:18px 0; border-top:1px solid var(--border); }
+.academic-item > div { min-width:0; flex:1 1 240px; overflow-wrap:anywhere; }
+.academic-item small { display:inline-block; margin-inline-start:10px; color:var(--muted); }
+.academic-note { padding:16px 20px; margin:16px 0; border-inline-start:3px solid var(--brand); border-radius:6px; background:var(--brand-soft); color:var(--ink); }
+.academic-note p { margin:6px 0 0; line-height:1.6; }
+.academic-details { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; margin:24px 0; }
+.academic-details > div { min-width:0; overflow-wrap:anywhere; }
+.academic-details dt { color:var(--muted); font-size:.875rem; margin-bottom:6px; }
+.academic-details dd { margin:0; font-weight:600; }
+.academic-motive { margin:24px 0; padding:20px 0; border-block:1px solid var(--border); }
+.academic-motive p { margin:10px 0 0; overflow-wrap:anywhere; }
+.academic-forms { margin-block:24px; }
+.academic-filter-fields { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px 16px; align-items:end; }
+.academic-filter-fields > div { margin:0; min-width:0; }
+.academic-filter-fields label { display:block; margin:0 0 8px; }
+.academic-filter-fields :is(input,select) { box-sizing:border-box; width:100%; height:44px; min-width:0; }
+.academic-filter-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; border-top:1px solid var(--border); margin-top:24px; padding-top:20px; }
+.academic-filter-actions > div { margin:0; }
+@media(max-width:900px) { .academic-details, .academic-filter-fields { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:600px) { .academic-section { padding:20px 16px; } .academic-details, .academic-filter-fields { grid-template-columns:minmax(0,1fr); } .academic-item > .button { width:100%; } .academic-note { padding:14px 16px; } }
+
+.academic-filter-fields > div > div { margin-bottom:0; }
+.academic-filter-actions .academic-check { display:flex; align-items:center; gap:10px; margin:0; font-weight:500; }
+.academic-check input[type=checkbox] { display:inline-block; flex:none; width:18px; height:18px; margin:0; accent-color:var(--brand); }
+
+/* Crispy ya dibuja su propia flecha: evitar la segunda flecha nativa. */
+.academic-filter-fields select:not([multiple]) { -webkit-appearance:none; appearance:none; background-image:none; padding-inline-end:2.75rem; }
+.academic-filter-fields select + .pointer-events-none { color:var(--muted); }
+.academic-filter-fields select + .pointer-events-none > svg { width:1rem; height:1rem; max-width:1rem; fill:currentColor; }

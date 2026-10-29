@@ -5,6 +5,21 @@ from . import academico, views
 app_name = "panol"
 urlpatterns = [
     path(
+        "catalogos/equipamiento/",
+        academico.ConfiguracionView.as_view(),
+        name="catalogo_equipamiento",
+    ),
+    path(
+        "catalogos/equipamiento/planes/<int:pk>/",
+        academico.PlanView.as_view(),
+        name="catalogo_equipamiento_plan",
+    ),
+    path(
+        "catalogos/equipamiento/periodos/<int:pk>/editar/",
+        academico.PeriodoEditView.as_view(),
+        name="catalogo_equipamiento_periodo",
+    ),
+    path(
         "academico/periodos/<int:pk>/editar/",
         academico.PeriodoEditView.as_view(),
         name="academico_periodo",

@@ -19,7 +19,7 @@ Si olvidaste tu contraseña, usa la ayuda del login y comunícate con el adminis
 
 ### Seguimiento académico y búsqueda
 
-Mi carrito permite buscar artículos por nombre/código y filtrar por categoría, con resultados paginados y búsqueda separada de kits. En **Seguimiento académico**, una cuenta con cargo ADMIN configura períodos, pautas de equipamiento y varios docentes por carrera/asignatura. Los docentes se seleccionan desde cuentas habilitadas; no se crea un cargo nuevo.
+Mi carrito permite buscar artículos por nombre/código y filtrar por categoría, con resultados paginados y búsqueda separada de kits. En **Catálogos del pañol → Asignaturas → Equipamiento**, una cuenta con cargo ADMIN configura el equipamiento previsto y los docentes de cada carrera/asignatura/período. También puede entrar por la pestaña **Equipamiento por asignatura**. Los docentes elegibles son cuentas activas con cargo RESTRICTED; los registros históricos se conservan aunque cambie su cargo. Los docentes se seleccionan desde cuentas habilitadas; no se crea un cargo nuevo.
 
 Los informes distinguen solicitudes de docentes/estudiantes, unidades y entregas reales. Permiten filtrar por 0, 1, 2, 3, 4, 5 o más solicitudes, revisar adicionales y consultar inactividad por semanas/meses/años. Los artículos adicionales están permitidos. Una solicitud académica conserva su contexto y pauta histórica; los pedidos generales sin contexto siguen disponibles.
 

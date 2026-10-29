@@ -36,3 +36,18 @@ def exigir_academico(user):
     if not puede_academico(user):
         raise PermissionDenied
     return get_user_model().objects.get(pk=user.pk)
+
+
+def docentes_elegibles():
+    """El cargo docente de este producto es RESTRICTED, sin excepción root."""
+    return get_user_model().objects.filter(
+        is_active=True, profile__position_FK__permission_code="RESTRICTED"
+    )
+
+
+def es_docente(user):
+    return bool(
+        user.is_authenticated
+        and user.pk
+        and docentes_elegibles().filter(pk=user.pk).exists()
+    )

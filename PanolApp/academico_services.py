@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 
 from .models import Docencia, EquipamientoAsignatura, PlanAsignatura
-from .permissions import exigir_academico, puede_solicitar
+from .permissions import es_docente, exigir_academico
 
 
 def contexto_solicitud(actor, datos):
@@ -28,7 +28,7 @@ def contexto_solicitud(actor, datos):
     )
     if not (
         d.activo
-        and puede_solicitar(d.docente)
+        and es_docente(d.docente)
         and plan.activo
         and plan.periodo.activo
         and plan.carrera.activo
@@ -85,8 +85,10 @@ def cambiar_plan(actor, pk, revision, accion, objeto=None):
     elif accion == "confirmar":
         plan.configurada = True
     elif accion == "docente":
-        if not puede_solicitar(objeto):
-            raise ValidationError("La cuenta no está habilitada para solicitar.")
+        if not es_docente(objeto):
+            raise ValidationError(
+                "Selecciona una cuenta docente activa con cargo RESTRICTED."
+            )
         d, _ = Docencia.objects.get_or_create(
             plan=plan, docente=objeto, defaults={"actor": actor}
         )

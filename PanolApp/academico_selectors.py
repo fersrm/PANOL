@@ -143,9 +143,34 @@ def seguimiento(actor, data, adicionales=False):
             }
         )
     filas.sort(key=lambda r: (-r["veces"], r["docencia"].pk, r["articulo"].nombre))
-    desconocidos = Solicitud.objects.filter(
-        Q(docencia__isnull=True) | Q(contexto__configurada=False)
-    ).count()
+    historicas = Solicitud.objects.all()
+    for campo in ("carrera", "asignatura"):
+        if data.get(campo):
+            historicas = historicas.filter(**{campo: data[campo]})
+    if data.get("periodo"):
+        historicas = historicas.filter(docencia__plan__periodo=data["periodo"])
+    if data.get("docente"):
+        historicas = historicas.filter(docencia__docente=data["docente"])
+    if data.get("desde"):
+        historicas = historicas.filter(fecha_necesaria__gte=data["desde"])
+    if data.get("hasta"):
+        historicas = historicas.filter(fecha_necesaria__lte=data["hasta"])
+    if not data.get("rechazadas"):
+        historicas = historicas.exclude(estado="rechazada")
+    if data.get("categoria"):
+        historicas = historicas.filter(lineas__articulo__categoria=data["categoria"])
+    if data.get("q"):
+        historicas = historicas.filter(
+            Q(lineas__articulo__nombre__icontains=data["q"])
+            | Q(lineas__articulo__codigo__icontains=data["q"])
+        )
+    desconocidos = (
+        historicas.filter(
+            Q(docencia__isnull=True) | Q(contexto__configurada=False) | Q(contexto={})
+        )
+        .distinct()
+        .count()
+    )
     return filas, desconocidos
 
 

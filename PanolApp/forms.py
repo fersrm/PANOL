@@ -194,6 +194,7 @@ class SolicitudForm(forms.ModelForm):
         self.fields["docencia"].queryset = Docencia.objects.filter(
             activo=True,
             docente__is_active=True,
+            docente__profile__position_FK__permission_code="RESTRICTED",
             plan__activo=True,
             plan__periodo__activo=True,
         ).select_related(

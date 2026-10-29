@@ -1,10 +1,11 @@
 """Vistas y formularios del seguimiento exclusivo ADMIN."""
 
 from django import forms
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
-from django.db.models import Q
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
 
 from .academico_selectors import catalogo, inactividad, seguimiento
@@ -18,7 +19,7 @@ from .models import (
     PeriodoAcademico,
     PlanAsignatura,
 )
-from .permissions import puede_academico
+from .permissions import docentes_elegibles, puede_academico
 from .views import PanolView
 
 
@@ -54,6 +55,7 @@ class PlanForm(forms.ModelForm):
     class Meta:
         model = PlanAsignatura
         fields = ["carrera", "asignatura", "periodo"]
+        labels = {"periodo": "Período"}
 
     def clean(self):
         d = super().clean()
@@ -83,31 +85,44 @@ class CuentaDocenteField(forms.ModelChoiceField):
 
 class DocenteForm(forms.Form):
     docente = CuentaDocenteField(
-        queryset=get_user_model()
-        .objects.filter(is_active=True)
-        .filter(
-            Q(is_superuser=True)
-            | Q(
-                profile__position_FK__permission_code__in=[
-                    "ADMIN",
-                    "MANAGER",
-                    "RESTRICTED",
-                ]
-            )
-        )
-        .distinct()
+        queryset=docentes_elegibles(),
+        help_text="Selecciona una cuenta docente activa (cargo RESTRICTED).",
     )
+
+
+class DocenteReporteField(CuentaDocenteField):
+    def label_from_instance(self, user):
+        label = super().label_from_instance(user)
+        perfil = getattr(user, "profile", None)
+        cargo = (
+            perfil.position_FK.permission_code
+            if perfil and perfil.position_FK
+            else None
+        )
+        return (
+            label
+            if user.is_active and cargo == "RESTRICTED"
+            else label + " · Registro anterior"
+        )
 
 
 class ReporteForm(forms.Form):
-    periodo = forms.ModelChoiceField(PeriodoAcademico.objects.all(), required=False)
+    periodo = forms.ModelChoiceField(
+        PeriodoAcademico.objects.all(), label="Período", required=False
+    )
     carrera = forms.ModelChoiceField(Carrera.objects.all(), required=False)
     asignatura = forms.ModelChoiceField(Asignatura.objects.all(), required=False)
-    docente = forms.ModelChoiceField(
-        get_user_model().objects.filter(docencia__isnull=False).distinct(),
+    docente = DocenteReporteField(
+        get_user_model()
+        .objects.filter(docencia__isnull=False)
+        .select_related("profile__position_FK")
+        .distinct(),
+        help_text="Selecciona un docente o deja este campo vacío para ver todos.",
         required=False,
     )
-    categoria = forms.ModelChoiceField(Categoria.objects.all(), required=False)
+    categoria = forms.ModelChoiceField(
+        Categoria.objects.all(), label="Categoría", required=False
+    )
     q = forms.CharField(
         label="Artículo: nombre o código", max_length=200, required=False
     )
@@ -153,7 +168,9 @@ class InactividadForm(forms.Form):
     q = forms.CharField(
         label="Artículo: nombre o código", max_length=200, required=False
     )
-    categoria = forms.ModelChoiceField(Categoria.objects.all(), required=False)
+    categoria = forms.ModelChoiceField(
+        Categoria.objects.all(), label="Categoría", required=False
+    )
     inactivos = forms.BooleanField(
         label="Incluir artículos deshabilitados", required=False
     )
@@ -168,15 +185,28 @@ class AcademicoView(PanolView):
 
 class ConfiguracionView(AcademicoView):
     def get(self, request):
+        seleccion = None
+        if request.GET.get("asignatura"):
+            try:
+                pk = forms.IntegerField(min_value=1).clean(request.GET["asignatura"])
+            except ValidationError:
+                raise Http404
+            seleccion = get_object_or_404(Asignatura, pk=pk)
+        planes = PlanAsignatura.objects.select_related(
+            "carrera", "asignatura", "periodo"
+        ).prefetch_related("equipamiento")
+        if seleccion:
+            planes = planes.filter(asignatura=seleccion)
         return self.page(
             "academico_config",
-            titulo="Configuración académica",
+            titulo="Equipamiento por asignatura",
+            asignatura_elegida=seleccion,
             periodos=PeriodoAcademico.objects.all(),
-            planes=PlanAsignatura.objects.select_related(
-                "carrera", "asignatura", "periodo"
-            ),
+            planes=planes,
             periodo_form=getattr(self, "periodo_form", PeriodoForm()),
-            plan_form=getattr(self, "plan_form", PlanForm()),
+            plan_form=getattr(
+                self, "plan_form", PlanForm(initial={"asignatura": seleccion})
+            ),
         )
 
     def post(self, request):
@@ -191,6 +221,7 @@ class ConfiguracionView(AcademicoView):
                 return self.invalid()
             with transaction.atomic():
                 self.periodo_form.save()
+            messages.success(request, "Período guardado.")
         else:
             self.plan_form = PlanForm(request.POST)
             if not self.plan_form.is_valid():
@@ -199,7 +230,12 @@ class ConfiguracionView(AcademicoView):
                 p = self.plan_form.save(commit=False)
                 p.actor = request.user
                 p.save()
-        return redirect("panol:academico_config")
+            messages.success(
+                request,
+                "Configuración creada. Ahora puedes asociar equipamiento y docentes.",
+            )
+            return redirect("panol:catalogo_equipamiento_plan", pk=p.pk)
+        return redirect("panol:catalogo_equipamiento")
 
 
 class PlanView(AcademicoView):
@@ -240,6 +276,14 @@ class PlanView(AcademicoView):
                 plan_id=pk,
             ).pk
         cambiar_plan(request.user, pk, revision, accion, objeto)
+        mensajes = {
+            "agregar": "Artículo asociado a la asignatura.",
+            "quitar": "Artículo retirado del equipamiento previsto.",
+            "confirmar": "Equipamiento previsto guardado.",
+            "docente": "Docente asociado a la asignatura y período.",
+            "desvincular": "Docente desvinculado. Sus solicitudes anteriores se conservan.",
+        }
+        messages.success(request, mensajes[accion])
         return redirect(request.get_full_path())
 
 
@@ -274,7 +318,7 @@ class ReporteView(AcademicoView):
             "academico_reporte",
             titulo="Adicionales frecuentes"
             if self.adicionales
-            else "Seguimiento académico",
+            else "Uso por asignatura",
             filtro=form,
             objetos=self.paginar(filas),
             desconocidos=desconocidos,
@@ -288,7 +332,7 @@ class PeriodoEditView(AcademicoView):
             "formulario",
             titulo="Editar período",
             form=self.form(PeriodoForm, instance=periodo),
-            volver="/panol/academico/configuracion/",
+            volver="/panol/catalogos/equipamiento/",
         )
 
     def post(self, request, pk):
@@ -300,4 +344,4 @@ class PeriodoEditView(AcademicoView):
             if not self.bound_form.is_valid():
                 return self.invalid()
             self.bound_form.save()
-        return redirect("panol:academico_config")
+        return redirect("panol:catalogo_equipamiento")
