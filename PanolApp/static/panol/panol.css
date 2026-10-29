@@ -116,6 +116,9 @@
 .academic-check input[type=checkbox] { display:inline-block; flex:none; width:18px; height:18px; margin:0; accent-color:var(--brand); }
 
 /* Crispy ya dibuja su propia flecha: evitar la segunda flecha nativa. */
-.academic-filter-fields select:not([multiple]) { -webkit-appearance:none; appearance:none; background-image:none; padding-inline-end:2.75rem; }
-.academic-filter-fields select + .pointer-events-none { color:var(--muted); }
-.academic-filter-fields select + .pointer-events-none > svg { width:1rem; height:1rem; max-width:1rem; fill:currentColor; }
+.academic-filter-fields select:not([multiple]),
+.panol-page .form-panel form.academico-filtro select:not([multiple]) { -webkit-appearance:none; appearance:none; background-image:none; padding-inline-end:2.75rem; }
+.academic-filter-fields select + .pointer-events-none,
+.academico-filtro select + .pointer-events-none { color:var(--muted); }
+.academic-filter-fields select + .pointer-events-none > svg,
+.academico-filtro select + .pointer-events-none > svg { width:1rem; height:1rem; max-width:1rem; fill:currentColor; }
