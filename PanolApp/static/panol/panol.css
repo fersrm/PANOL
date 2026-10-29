@@ -106,6 +106,10 @@
 .academic-filter-fields > div { margin:0; min-width:0; }
 .academic-filter-fields label { display:block; margin:0 0 8px; }
 .academic-filter-fields :is(input,select) { box-sizing:border-box; width:100%; height:44px; min-width:0; }
+/* Las opciones nativas necesitan fondo sólido además del color del texto. */
+.academic-filter-fields select { color-scheme:light; background-color:var(--surface); color:var(--ink); }
+html[data-mode="dark"] .academic-filter-fields select { color-scheme:dark; }
+.academic-filter-fields select :is(option,optgroup) { background-color:var(--surface); color:var(--ink); }
 .academic-filter-actions { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; border-top:1px solid var(--border); margin-top:24px; padding-top:20px; }
 .academic-filter-actions > div { margin:0; }
 @media(max-width:900px) { .academic-details, .academic-filter-fields { grid-template-columns:repeat(2,minmax(0,1fr)); } }
