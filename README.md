@@ -17,6 +17,14 @@ Inicio conserva la tabla de actividad de usuarios, permanece primero en el menú
 
 Si olvidaste tu contraseña, usa la ayuda del login y comunícate con el administrador de la plataforma. Este proyecto no envía enlaces de recuperación por correo; las URLs antiguas muestran la misma orientación y no aceptan restablecimientos por token. El administrador autorizado conserva la acción de restablecimiento del listado de usuarios. El menú de cuenta incluye perfil, seguridad y cierre de sesión, sin acceso a correo electrónico. El cambio de tu propia contraseña con sesión y MFA siguen disponibles.
 
+### Seguimiento académico y búsqueda
+
+Mi carrito permite buscar artículos por nombre/código y filtrar por categoría, con resultados paginados y búsqueda separada de kits. En **Seguimiento académico**, una cuenta con cargo ADMIN configura períodos, pautas de equipamiento y varios docentes por carrera/asignatura. Los docentes se seleccionan desde cuentas habilitadas; no se crea un cargo nuevo.
+
+Los informes distinguen solicitudes de docentes/estudiantes, unidades y entregas reales. Permiten filtrar por 0, 1, 2, 3, 4, 5 o más solicitudes, revisar adicionales y consultar inactividad por semanas/meses/años. Los artículos adicionales están permitidos. Una solicitud académica conserva su contexto y pauta histórica; los pedidos generales sin contexto siguen disponibles.
+
+La migración aditiva `PanolApp/0002_articulo_creada_solicitud_contexto_docencia_and_more.py` debe instalarse, tras respaldo y autorización de la base de destino, antes de usar esta versión. Las solicitudes anteriores conservan Profesor como texto histórico sin vinculación automática. La antigüedad de artículos heredados permanece desconocida. Implementación local verificada con datos ficticios; esta entrega no aplica la migración a bases existentes ni publica el cambio.
+
 ### Instalar el nuevo esquema en una base existente
 
 La migración `PanolApp/0001_initial.py` está incluida y fue ensayada con datos ficticios en SQLite temporal. No se ha aplicado a la base local existente por esta entrega. Después de respaldar y elegir explícitamente la base de destino, usa el entorno configurado:

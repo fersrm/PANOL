@@ -364,7 +364,12 @@ def crear_solicitud(actor, version, clave, datos):
     )
     if datos["tipo"] not in Solicitud.Tipo.values:
         raise ValidationError("Tipo de solicitante inválido.")
+    from .academico_services import contexto_solicitud
+
+    docencia, contexto = contexto_solicitud(actor, datos)
     solicitud = Solicitud(
+        docencia=docencia,
+        contexto=contexto,
         propietario=actor,
         clave=clave,
         tipo=datos["tipo"],
@@ -373,7 +378,7 @@ def crear_solicitud(actor, version, clave, datos):
         procedencia=origen,
         carrera=datos.get("carrera"),
         asignatura=datos.get("asignatura"),
-        profesor=datos.get("profesor", ""),
+        profesor=contexto.get("docente", ""),
     )
     solicitud.full_clean()
     solicitud.save()

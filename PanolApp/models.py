@@ -50,6 +50,7 @@ class Asignatura(NombreActivo):
 
 
 class Articulo(NombreActivo):
+    creada = models.DateTimeField(default=timezone.now, null=True, editable=False)
     codigo = models.CharField("código", max_length=50, unique=True)
     descripcion = models.TextField("descripción", max_length=2000, blank=True)
     categoria = models.ForeignKey(
@@ -238,6 +239,10 @@ class Solicitud(models.Model):
     asignatura = models.ForeignKey(
         Asignatura, null=True, blank=True, on_delete=models.PROTECT
     )
+    docencia = models.ForeignKey(
+        "Docencia", null=True, blank=True, on_delete=models.PROTECT
+    )
+    contexto = models.JSONField(default=dict, blank=True)
     profesor = models.CharField(max_length=200, blank=True)
     procedencia = models.JSONField(default=list)
     resolucion = models.TextField(max_length=2000, blank=True)
@@ -396,3 +401,74 @@ class MovimientoInventario(models.Model):
 
     class Meta:
         ordering = ["-fecha", "-pk"]
+
+
+class PeriodoAcademico(NombreActivo):
+    codigo = models.CharField(max_length=50, unique=True)
+    inicio = models.DateField()
+    fin = models.DateField()
+
+    class Meta(NombreActivo.Meta):
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(inicio__lte=F("fin")), name="panol_periodo_fechas"
+            )
+        ]
+
+
+class PlanAsignatura(models.Model):
+    carrera = models.ForeignKey(Carrera, on_delete=models.PROTECT)
+    asignatura = models.ForeignKey(Asignatura, on_delete=models.PROTECT)
+    periodo = models.ForeignKey(PeriodoAcademico, on_delete=models.PROTECT)
+    revision = models.PositiveIntegerField(default=1)
+    configurada = models.BooleanField(default=False)
+    activo = models.BooleanField(default=True)
+    actor = models.ForeignKey(USER, on_delete=models.PROTECT)
+    modificada = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["asignatura__nombre", "pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["carrera", "asignatura", "periodo"], name="panol_plan_unico"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.carrera} / {self.asignatura} / {self.periodo}"
+
+
+class EquipamientoAsignatura(models.Model):
+    plan = models.ForeignKey(
+        PlanAsignatura, on_delete=models.PROTECT, related_name="equipamiento"
+    )
+    articulo = models.ForeignKey(Articulo, on_delete=models.PROTECT)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["plan", "articulo"], name="panol_pauta_articulo"
+            )
+        ]
+
+
+class Docencia(models.Model):
+    plan = models.ForeignKey(
+        PlanAsignatura, on_delete=models.PROTECT, related_name="docencias"
+    )
+    docente = models.ForeignKey(USER, on_delete=models.PROTECT)
+    activo = models.BooleanField(default=True)
+    actor = models.ForeignKey(
+        USER, on_delete=models.PROTECT, related_name="docencias_configuradas"
+    )
+    modificada = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["plan", "docente"], name="panol_docencia_unica"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.docente.get_full_name() or self.docente.username} ({self.docente.username}) · {self.plan}"

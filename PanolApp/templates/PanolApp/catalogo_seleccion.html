@@ -1,0 +1,23 @@
+<section class="panel panol-catalog" aria-labelledby="catalogo-articulos">
+  <header class="panol-catalog-heading"><h2 id="catalogo-articulos">Buscar artículos</h2><span>{{ catalogo.paginator.count }} artículo{{ catalogo.paginator.count|pluralize:"s" }}</span></header>
+  <form method="get" class="panol-catalog-filter">
+    <div class="panol-catalog-fields">
+      <div><label for="buscar-articulo">Nombre o código</label><input id="buscar-articulo" name="q" value="{{ buscar }}" maxlength="200"></div>
+      <div><label for="categoria-articulo">Categoría</label><select id="categoria-articulo" name="categoria"><option value="">Todas las categorías</option>{% for c in categorias %}<option value="{{ c.pk }}" {% if categoria_elegida == c.pk|stringformat:'s' %}selected{% endif %}>{{ c }}</option>{% endfor %}</select></div>
+    </div>
+    <div class="panol-catalog-actions"><button type="submit" class="button">Buscar</button><a class="button secondary" href="{{ request.path }}">Limpiar filtros</a></div>
+  </form>
+  <div class="panol-catalog-results">
+    {% for a in catalogo %}
+    <form method="post" class="panol-catalog-row">
+      {% csrf_token %}<input type="hidden" name="accion" value="agregar"><input type="hidden" name="articulo" value="{{ a.pk }}"><input type="hidden" name="version" value="{{ version }}"><input type="hidden" name="revision" value="{{ plan.revision }}">
+      <div class="panol-catalog-info"><strong>{{ a.nombre }}</strong><p>{{ a.codigo }} · {{ a.categoria }}</p><span>{{ a.disponible }} disponibles</span></div>
+      <div class="panol-catalog-controls{% if plan %} panol-catalog-controls--single{% endif %}">
+        {% if not plan %}<div><label for="agregar-articulo-{{ a.pk }}">Cantidad</label><input id="agregar-articulo-{{ a.pk }}" aria-label="Cantidad de {{ a.nombre }}" type="number" name="cantidad" value="1" min="1" max="9999" required></div>{% endif %}
+        <button class="button" type="submit" aria-label="{% if plan %}Asociar{% else %}Agregar{% endif %} {{ a.nombre }}">{% if plan %}Asociar{% else %}Agregar{% endif %}</button>
+      </div>
+    </form>
+    {% empty %}<p class="panol-catalog-empty">No hay artículos para estos filtros.</p>{% endfor %}
+  </div>
+  {% include 'PanolApp/paginacion.html' with objetos=catalogo %}
+</section>

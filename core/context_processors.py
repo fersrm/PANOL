@@ -28,9 +28,17 @@ def preferencias_visuales(request):
 def permisos_navegacion(request):
     """Expone al menú la misma política que protege el registro interno."""
     puede_gestionar = usuario_tiene_cargo(request.user, PermitsPositionMixin.permisos)
-    from PanolApp.permissions import puede_operar, puede_solicitar
+    from PanolApp.permissions import puede_academico, puede_operar, puede_solicitar
 
     secciones = {
+        "academico": (
+            "academico",
+            "academico_adicionales",
+            "academico_inactividad",
+            "academico_config",
+            "academico_plan",
+            "academico_periodo",
+        ),
         "inventario": (
             "inventario",
             "articulo",
@@ -58,6 +66,7 @@ def permisos_navegacion(request):
 
     return {
         "seccion_panol": seccion,
+        "puede_academico": puede_academico(request.user),
         "puede_usar_panol": puede_solicitar(request.user),
         "puede_operar_panol": puede_operar(request.user),
         "puede_registrar_usuarios": bool(cargos_asignables(request.user)),

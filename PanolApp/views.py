@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.views import View
 
 from . import forms, services
+from .academico_selectors import catalogo
 from .models import (
     Area,
     Articulo,
@@ -283,6 +284,7 @@ class CarritoView(PanolView):
             version=version,
             agregar=getattr(self, "agregar", None)
             or forms.AgregarForm(initial={"version": version}),
+            **catalogo(request.GET),
             guardar=getattr(self, "guardar", None)
             or forms.GuardarPlantillaForm(initial={"version": version}),
         )
@@ -327,7 +329,10 @@ class CarritoView(PanolView):
                 cantidad=int(cantidad),
             )
             messages.success(request, "Carrito actualizado.")
-        return redirect("panol:carrito")
+        return redirect(
+            reverse("panol:carrito")
+            + ("?" + request.GET.urlencode() if request.GET else "")
+        )
 
 
 class PlantillasView(PanolView):
@@ -427,6 +432,7 @@ class EnviarView(PanolView):
             avisos=avisos,
             form=self.form(
                 forms.DirectoForm if self.directo else forms.SolicitudForm,
+                **({} if self.directo else {"actor": request.user}),
                 initial={
                     "version": version,
                     "token": token(request.user, accion),
@@ -439,7 +445,7 @@ class EnviarView(PanolView):
 
     def post(self, request):
         self.bound_form = (forms.DirectoForm if self.directo else forms.SolicitudForm)(
-            request.POST
+            request.POST, **({} if self.directo else {"actor": request.user})
         )
         if not self.bound_form.is_valid():
             return self.invalid()
@@ -687,6 +693,23 @@ class CatalogoEditView(PanolView):
         if not self.bound_form.is_valid():
             return self.invalid()
         with transaction.atomic():
+            if tipo == "asignaturas" and objeto.pk:
+                from .models import PlanAsignatura
+
+                necesarios = set(
+                    PlanAsignatura.objects.filter(asignatura=objeto).values_list(
+                        "carrera_id", flat=True
+                    )
+                )
+                elegidos = set(
+                    self.bound_form.cleaned_data["carreras"].values_list(
+                        "pk", flat=True
+                    )
+                )
+                if not necesarios <= elegidos:
+                    raise ValidationError(
+                        "No puedes retirar carreras con pautas académicas. Conserva sus vínculos históricos."
+                    )
             self.bound_form.save()
         messages.success(request, "Catálogo guardado.")
         return redirect("panol:catalogo", tipo=tipo)

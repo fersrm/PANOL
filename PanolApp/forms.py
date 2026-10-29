@@ -144,6 +144,25 @@ class PlantillaForm(forms.ModelForm):
         fields = ["nombre"]
 
 
+class DocenciaSelect(forms.Select):
+    def create_option(
+        self, name, value, label, selected, index, subindex=None, attrs=None
+    ):
+        option = super().create_option(
+            name, value, label, selected, index, subindex, attrs
+        )
+        if value and hasattr(value, "instance"):
+            d = value.instance
+            option["attrs"].update(
+                {
+                    "data-carrera": d.plan.carrera_id,
+                    "data-asignatura": d.plan.asignatura_id,
+                    "data-docente": d.docente_id,
+                }
+            )
+        return option
+
+
 class SolicitudForm(forms.ModelForm):
     version = forms.IntegerField(min_value=0, widget=forms.HiddenInput)
     token = forms.CharField(widget=forms.HiddenInput)
@@ -156,7 +175,7 @@ class SolicitudForm(forms.ModelForm):
             "fecha_necesaria",
             "carrera",
             "asignatura",
-            "profesor",
+            "docencia",
         ]
         widgets = {
             "motivo": forms.Textarea(attrs={"rows": 3}),
@@ -165,13 +184,40 @@ class SolicitudForm(forms.ModelForm):
             ),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, actor=None, **kwargs):
+        self.actor = actor
         super().__init__(*args, **kwargs)
+        from .models import Docencia
+
+        self.fields["docencia"].label = "Docente / período"
+        self.fields["docencia"].widget = DocenciaSelect()
+        self.fields["docencia"].queryset = Docencia.objects.filter(
+            activo=True,
+            docente__is_active=True,
+            plan__activo=True,
+            plan__periodo__activo=True,
+        ).select_related(
+            "docente", "plan__periodo", "plan__carrera", "plan__asignatura"
+        )
+        self.fields[
+            "docencia"
+        ].help_text = "Elige la asociación de docente, asignatura y período. Para tipo Docente, usa tu propia cuenta."
         self.fields["carrera"].queryset = Carrera.objects.filter(
             activo=True, area__activo=True
         )
         self.fields["asignatura"].queryset = Asignatura.objects.filter(activo=True)
-        for name in ("carrera", "asignatura", "profesor"):
+        if self.is_bound:
+            for field in ("carrera", "asignatura"):
+                value = self.data.get(field, "")
+                if value and str(value).isdecimal():
+                    self.fields["docencia"].queryset = self.fields[
+                        "docencia"
+                    ].queryset.filter(**{f"plan__{field}_id": int(value)})
+            if actor and self.data.get("tipo") == "docente":
+                self.fields["docencia"].queryset = self.fields[
+                    "docencia"
+                ].queryset.filter(docente=actor)
+        for name in ("carrera", "asignatura"):
             self.fields[name].help_text = "Opcional."
 
     def clean_fecha_necesaria(self):
@@ -190,6 +236,11 @@ class SolicitudForm(forms.ModelForm):
         ):
             raise ValidationError(
                 "La asignatura no pertenece a la carrera seleccionada."
+            )
+        academic = [data.get(n) for n in ("carrera", "asignatura", "docencia")]
+        if any(academic) and not all(academic):
+            raise ValidationError(
+                "Completa carrera, asignatura y docente/período para un pedido académico, o deja los tres vacíos para soporte general."
             )
         return data
 

@@ -1,7 +1,8 @@
-{% extends 'PanolApp/base.html' %}{% load crispy_forms_tags %}
+{% extends 'PanolApp/base.html' %}{% load crispy_forms_tags static %}
 {% block acciones %}<a class="button secondary" href="{{ volver }}">Volver</a>{% endblock %}
 {% block panol_content %}
 {% if avisos %}<section class="panel panol-summary" role="status"><h2>Revisa la disponibilidad</h2>{% for aviso in avisos %}<p>{{ aviso }}</p>{% endfor %}<p>La disponibilidad puede cambiar hasta la entrega. Una solicitud no reserva materiales.</p></section>{% endif %}
 {% if resumen %}<section class="panel"><header class="panel-heading"><h2>Artículos del carrito</h2></header><ul class="panol-list">{% for linea in resumen %}<li>{{ linea.nombre }} · {{ linea.cantidad }}{% if linea.kit_id %} kit(s){% endif %}</li>{% endfor %}</ul></section>{% endif %}
 <section class="panel form-panel"><p>{{ ayuda }}</p><form method="post">{% csrf_token %}{{ form|crispy }}<div class="panol-toolbar"><button type="submit" class="button">{{ boton|default:'Guardar' }}</button><a class="button secondary" href="{{ volver }}">Cancelar</a></div></form></section>
 {% endblock %}
+{% block javascript %}{{ block.super }}{% if form.docencia %}<script src="{% static 'panol/solicitud.js' %}" defer data-actor="{{ request.user.pk }}"></script>{% endif %}{% endblock %}

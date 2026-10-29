@@ -1,9 +1,35 @@
 from django.urls import path
 
-from . import views
+from . import academico, views
 
 app_name = "panol"
 urlpatterns = [
+    path(
+        "academico/periodos/<int:pk>/editar/",
+        academico.PeriodoEditView.as_view(),
+        name="academico_periodo",
+    ),
+    path("academico/", academico.ReporteView.as_view(), name="academico"),
+    path(
+        "academico/adicionales/",
+        academico.ReporteView.as_view(adicionales=True),
+        name="academico_adicionales",
+    ),
+    path(
+        "academico/sin-movimiento/",
+        academico.ReporteView.as_view(sin_movimiento=True),
+        name="academico_inactividad",
+    ),
+    path(
+        "academico/configuracion/",
+        academico.ConfiguracionView.as_view(),
+        name="academico_config",
+    ),
+    path(
+        "academico/planes/<int:pk>/",
+        academico.PlanView.as_view(),
+        name="academico_plan",
+    ),
     path("inventario/", views.InventarioView.as_view(), name="inventario"),
     path("inventario/nuevo/", views.ArticuloEditView.as_view(), name="articulo_nuevo"),
     path("inventario/<int:pk>/", views.ArticuloDetailView.as_view(), name="articulo"),
