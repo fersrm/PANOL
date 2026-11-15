@@ -37,14 +37,21 @@ def catalogo(data):
     }
 
 
-def seguimiento(actor, data, adicionales=False):
-    exigir_academico(actor)
-    docentes = Docencia.objects.select_related(
-        "docente", "plan__asignatura", "plan__carrera", "plan__periodo"
-    ).prefetch_related("plan__equipamiento__articulo")
+def docencias_seguimiento(data):
+    docencias = Docencia.objects.all()
     for campo in ("periodo", "carrera", "asignatura"):
         if data.get(campo):
-            docentes = docentes.filter(**{f"plan__{campo}": data[campo]})
+            docencias = docencias.filter(**{f"plan__{campo}": data[campo]})
+    return docencias
+
+
+def seguimiento(actor, data, adicionales=False):
+    exigir_academico(actor)
+    docentes = (
+        docencias_seguimiento(data)
+        .select_related("docente", "plan__asignatura", "plan__carrera", "plan__periodo")
+        .prefetch_related("plan__equipamiento__articulo")
+    )
     if data.get("docente"):
         docentes = docentes.filter(docente=data["docente"])
     docs = list(docentes)

@@ -5,10 +5,17 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
-from django.http import Http404
+from django.db.models import Q
+from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
+from django.utils.cache import add_never_cache_headers
 
-from .academico_selectors import catalogo, inactividad, seguimiento
+from .academico_selectors import (
+    catalogo,
+    docencias_seguimiento,
+    inactividad,
+    seguimiento,
+)
 from .academico_services import cambiar_plan
 from .models import (
     Articulo,
@@ -114,9 +121,8 @@ class ReporteForm(forms.Form):
     asignatura = forms.ModelChoiceField(Asignatura.objects.all(), required=False)
     docente = DocenteReporteField(
         get_user_model()
-        .objects.filter(docencia__isnull=False)
-        .select_related("profile__position_FK")
-        .distinct(),
+        .objects.select_related("profile__position_FK")
+        .order_by("first_name", "last_name", "username"),
         help_text="Selecciona un docente o deja este campo vacío para ver todos.",
         required=False,
     )
@@ -145,11 +151,50 @@ class ReporteForm(forms.Form):
     )
     rechazadas = forms.BooleanField(label="Incluir demanda rechazada", required=False)
 
+    def acotar_campo(self, campo, queryset):
+        self.fields[campo].queryset = queryset
+        elegido = self.cleaned_data.get(campo)
+        if elegido is not None and not queryset.contains(elegido):
+            self.add_error(campo, "Esta opción no corresponde al contexto seleccionado.")
+
     def clean(self):
         d = super().clean()
+        planes = PlanAsignatura.objects.order_by()
+        periodo = d.get("periodo")
+        if periodo:
+            planes = planes.filter(periodo=periodo)
+            self.acotar_campo(
+                "carrera", Carrera.objects.filter(pk__in=planes.values("carrera_id"))
+            )
+        carrera = d.get("carrera")
+        if carrera:
+            planes = planes.filter(carrera=carrera)
+        if periodo or carrera:
+            asignaturas = Q(pk__in=planes.values("asignatura_id"))
+            if not periodo:
+                asignaturas |= Q(carreras=carrera)
+            self.acotar_campo(
+                "asignatura", Asignatura.objects.filter(asignaturas).distinct()
+            )
+
+        docentes = docencias_seguimiento(d).values("docente_id")
+        campo_docente = self.fields["docente"]
+        self.acotar_campo("docente", campo_docente.queryset.filter(pk__in=docentes))
+        if not campo_docente.queryset.exists():
+            campo_docente.empty_label = "Sin docentes vinculados"
+
         if d.get("desde") and d.get("hasta") and d["desde"] > d["hasta"]:
             raise ValidationError("Rango de fechas inválido.")
         return d
+
+    def opciones_contexto(self):
+        return {
+            campo: [
+                (str(valor), str(etiqueta))
+                for valor, etiqueta in self.fields[campo].choices
+            ]
+            for campo in ("carrera", "asignatura", "docente")
+        }
 
 
 class InactividadForm(forms.Form):
@@ -309,9 +354,14 @@ class ReporteView(AcademicoView):
                 corte=corte,
             )
         form = ReporteForm(request.GET)
+        valido = form.is_valid()
+        if request.GET.get("opciones") == "1":
+            response = JsonResponse(form.opciones_contexto())
+            add_never_cache_headers(response)
+            return response
         filas, desconocidos = (
             seguimiento(request.user, form.cleaned_data, self.adicionales)
-            if form.is_valid()
+            if valido
             else ([], 0)
         )
         return self.page(

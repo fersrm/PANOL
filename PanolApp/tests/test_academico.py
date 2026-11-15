@@ -146,6 +146,153 @@ class AcademicoTests(Base):
             200,
         )
 
+    def test_opciones_de_ambos_informes_cruzan_el_mismo_plan(self):
+        diseno = Carrera.objects.create(
+            codigo="DDW", nombre="Diseño Digital Web", area=self.carrera.area
+        )
+        self.asignatura.carreras.add(diseno)
+        composicion = Asignatura.objects.create(codigo="COMP", nombre="Composición")
+        composicion.carreras.add(diseno)
+        otro_periodo = PeriodoAcademico.objects.create(
+            codigo="2027",
+            nombre="Otro período",
+            inicio=self.periodo.inicio,
+            fin=self.periodo.fin,
+        )
+        for carrera, periodo, asignatura in [
+            (diseno, self.periodo, self.asignatura),
+            (self.carrera, otro_periodo, self.asignatura),
+            (diseno, self.periodo, composicion),
+        ]:
+            plan = PlanAsignatura.objects.create(
+                carrera=carrera,
+                periodo=periodo,
+                asignatura=asignatura,
+                actor=self.admin,
+            )
+            Docencia.objects.create(plan=plan, docente=self.otra, actor=self.admin)
+
+        sin_docente = Asignatura.objects.create(codigo="UX", nombre="Diseño UX")
+        sin_pauta = Asignatura.objects.create(codigo="WEB", nombre="Taller web")
+        sin_docente.carreras.add(diseno)
+        sin_pauta.carreras.add(diseno)
+        PlanAsignatura.objects.create(
+            carrera=diseno,
+            periodo=self.periodo,
+            asignatura=sin_docente,
+            actor=self.admin,
+        )
+        self.client.force_login(self.admin)
+
+        def opciones(ruta, **contexto):
+            url = reverse("panol:" + ruta)
+            respuesta = self.client.get(url, {"opciones": "1", **contexto})
+            self.assertIn("no-store", respuesta.headers["Cache-Control"])
+            return respuesta.json()
+
+        for ruta in ("academico", "academico_adicionales"):
+            with self.subTest(ruta=ruta):
+                datos = opciones(ruta, periodo=self.periodo.pk, carrera=diseno.pk)
+                self.assertEqual(
+                    set(dict(datos["asignatura"])) - {""},
+                    {str(self.asignatura.pk), str(composicion.pk), str(sin_docente.pk)},
+                )
+                self.assertEqual(list(dict(datos["docente"]))[1:], [str(self.otra.pk)])
+                datos = opciones(
+                    ruta,
+                    periodo=self.periodo.pk,
+                    carrera=self.carrera.pk,
+                    asignatura=self.asignatura.pk,
+                )
+                self.assertEqual(
+                    list(dict(datos["docente"]))[1:], [str(self.persona.pk)]
+                )
+                datos = opciones(
+                    ruta,
+                    periodo=otro_periodo.pk,
+                    carrera=self.carrera.pk,
+                    asignatura=self.asignatura.pk,
+                )
+                self.assertEqual(
+                    list(dict(datos["carrera"]))[1:], [str(self.carrera.pk)]
+                )
+                self.assertEqual(list(dict(datos["docente"]))[1:], [str(self.otra.pk)])
+                datos = opciones(ruta, carrera=diseno.pk)
+                self.assertIn(str(sin_pauta.pk), dict(datos["asignatura"]))
+                datos = opciones(
+                    ruta,
+                    periodo=self.periodo.pk,
+                    carrera=diseno.pk,
+                    asignatura=sin_docente.pk,
+                )
+                self.assertEqual(datos["docente"], [["", "Sin docentes vinculados"]])
+
+    def test_informes_validan_get_y_conservan_docentes_historicos(self):
+        self.pedir(self.cable)
+        self.plan.activo = False
+        self.plan.save(update_fields=["activo"])
+        self.docencia.activo = False
+        self.docencia.save(update_fields=["activo"])
+        self.persona.profile.position_FK = self.manager.profile.position_FK
+        self.persona.profile.save()
+        ajena = Asignatura.objects.create(codigo="AJENA", nombre="Asignatura ajena")
+        self.client.force_login(self.admin)
+        filtros = {
+            "periodo": self.periodo.pk,
+            "carrera": self.carrera.pk,
+            "asignatura": self.asignatura.pk,
+            "docente": self.persona.pk,
+            "categoria": self.categoria.pk,
+        }
+        for ruta, articulo, veces in (
+            ("academico", self.articulo, 0),
+            ("academico_adicionales", self.cable, 1),
+        ):
+            url = reverse("panol:" + ruta)
+            with self.subTest(ruta=ruta):
+                r = self.client.get(url, {**filtros, "page": 1})
+                self.assertContains(r, "Registro anterior")
+                self.assertNotContains(r, ajena.nombre)
+                self.assertEqual(
+                    [
+                        (fila["articulo"], fila["veces"])
+                        for fila in r.context["objetos"]
+                    ],
+                    [(articulo, veces)],
+                )
+                for campo, valor in (
+                    ("asignatura", ajena.pk),
+                    ("docente", self.otra.pk),
+                    ("periodo", "texto"),
+                    ("carrera", 10**40),
+                ):
+                    r = self.client.get(url, {**filtros, campo: valor})
+                    self.assertIn(campo, r.context["filtro"].errors)
+                    self.assertEqual(list(r.context["objetos"]), [])
+
+    def test_opciones_de_contexto_requieren_admin(self):
+        administrador_root = self.usuario("super_admin", "ADMIN", superuser=True)
+        for ruta in ("academico", "academico_adicionales"):
+            url = reverse("panol:" + ruta)
+            self.client.logout()
+            self.assertEqual(self.client.get(url, {"opciones": "1"}).status_code, 302)
+            for actor, codigo in (
+                (self.admin, 200),
+                (administrador_root, 200),
+                (self.manager, 403),
+                (self.persona, 403),
+                (self.root, 403),
+                (self.sin_perfil, 403),
+                (self.sin_cargo, 403),
+                (self.inactivo, 302),
+            ):
+                with self.subTest(ruta=ruta, actor=actor):
+                    self.client.force_login(actor)
+                    r = self.client.get(url, {"opciones": "1"})
+                    self.assertEqual(r.status_code, codigo)
+                    if codigo == 200:
+                        self.assertIn("docente", r.json())
+
     def test_busqueda_carrito_y_paginacion(self):
         for n in range(25):
             Articulo.objects.create(
